@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/acc</item>
+        <item name="colorPrimaryDark">@color/accDark</item>
+        <item name="colorAccent">@color/acc</item>
+        <item name="android:statusBarColor">@color/accDark</item>
+    </style>
+    <style name="FieldLabel" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/mut</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+    <style name="TextAppearance.MaterialComponents.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>
