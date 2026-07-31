@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/xName"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Extra charge name"
+        android:textSize="14sp"
+        android:inputType="text"
+        android:background="@drawable/bg_input"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginBottom="12dp" />
+
+    <EditText
+        android:id="@+id/xRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Rate (Rs)"
+        android:textSize="14sp"
+        android:inputType="numberDecimal"
+        android:background="@drawable/bg_input"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Charge basis"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#66758C"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/xBasis"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply to"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:textColor="#66758C"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/xSys"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+</LinearLayout>
