@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="20dp">
+
+    <TextView style="@style/FieldLabel" android:text="NAME"/>
+    <EditText android:id="@+id/xName" android:layout_width="match_parent"
+        android:layout_height="44dp" android:background="@drawable/bg_input"
+        android:inputType="text" android:textSize="14sp" android:padding="8dp"
+        android:hint="e.g. Lock, Handle, Labour"/>
+
+    <TextView style="@style/FieldLabel" android:text="CHARGE BASIS"
+        android:layout_marginTop="12dp"/>
+    <Spinner android:id="@+id/xBasis" android:layout_width="match_parent"
+        android:layout_height="44dp" android:background="@drawable/bg_input"/>
+
+    <TextView style="@style/FieldLabel" android:text="APPLIES TO"
+        android:layout_marginTop="12dp"/>
+    <Spinner android:id="@+id/xSys" android:layout_width="match_parent"
+        android:layout_height="44dp" android:background="@drawable/bg_input"/>
+
+    <TextView style="@style/FieldLabel" android:text="RATE (Rs)"
+        android:layout_marginTop="12dp"/>
+    <EditText android:id="@+id/xRate" android:layout_width="match_parent"
+        android:layout_height="44dp" android:background="@drawable/bg_input"
+        android:inputType="numberDecimal" android:textSize="15sp"
+        android:textStyle="bold" android:gravity="center" android:padding="8dp"/>
+</LinearLayout>

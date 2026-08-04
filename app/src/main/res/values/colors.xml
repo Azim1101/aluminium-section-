@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="acc">#2563EB</color>
+    <color name="accDark">#1D4ED8</color>
+    <color name="accLight">#E8F0FF</color>
+    <color name="bg">#F4F6FB</color>
+    <color name="card">#FFFFFF</color>
+    <color name="line">#E5EAF3</color>
+    <color name="txt">#152236</color>
+    <color name="mut">#66758C</color>
+    <color name="ok">#16A34A</color>
+    <color name="warn">#EA580C</color>
+    <color name="red">#DC2626</color>
+    <color name="cFrame">#3B82F6</color>
+    <color name="cSutter">#22C55E</color>
+    <color name="cMuliya">#8B5CF6</color>
+    <color name="cRp">#EC4899</color>
+    <color name="waste">#D8DFE9</color>
+</resources>

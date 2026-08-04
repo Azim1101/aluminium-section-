@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ============ BUSINESS INFO ============ -->
+        <TextView style="@style/SecHead" android:text="BUSINESS INFO"
+            android:textColor="#7C3AED"/>
+
+        <LinearLayout style="@style/FieldBox">
+            <TextView style="@style/FieldLabel" android:text="SHOP / COMPANY NAME"/>
+            <EditText android:id="@+id/sBizName" style="@style/FieldInput"
+                android:hint="e.g. Digital Alu. Section"/>
+        </LinearLayout>
+
+        <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
+            <TextView style="@style/FieldLabel" android:text="ADDRESS"/>
+            <EditText android:id="@+id/sBizAddr" style="@style/FieldInput"
+                android:hint="e.g. Wankaner 363621"/>
+        </LinearLayout>
+
+        <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
+            <TextView style="@style/FieldLabel" android:text="MOBILE NUMBER"/>
+            <EditText android:id="@+id/sBizMobile" style="@style/FieldInput"
+                android:hint="e.g. 99799 71170"
+                android:inputType="phone"/>
+        </LinearLayout>
+
+        <!-- ============ UNIT & STOCK ============ -->
+        <TextView style="@style/SecHead" android:text="UNIT &amp; STOCK"
+            android:layout_marginTop="12dp"/>
+        <RadioGroup android:id="@+id/rgUnit"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/rbIn" android:layout_width="0dp"
+                android:layout_weight="1" android:layout_height="wrap_content"
+                android:text="INCH" android:checked="true"/>
+            <RadioButton android:id="@+id/rbMm" android:layout_width="0dp"
+                android:layout_weight="1" android:layout_height="wrap_content"
+                android:text="MM"/>
+        </RadioGroup>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="STOCK PIPE"/>
+                <EditText android:id="@+id/sStock" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="BLADE / KERF"/>
+                <EditText android:id="@+id/sKerf" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============ ZED ============ -->
+        <TextView style="@style/SecHead" android:text="ZED  —  DEDUCTION (INCH)"
+            android:textColor="#2563EB"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit"/>
+                <EditText android:id="@+id/zDw" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="SUTTER H"/>
+                <EditText android:id="@+id/zDh" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false"
+            android:layout_marginTop="6dp">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="MULIYA H"/>
+                <EditText android:id="@+id/zDm" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="GLASS"/>
+                <EditText android:id="@+id/zDg" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="RP = W −"/>
+                <EditText android:id="@+id/zRpDed" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============ DOMAL ============ -->
+        <TextView style="@style/SecHead" android:text="DOMAL  —  DEDUCTION (INCH)"
+            android:textColor="#0EA5E9"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit"/>
+                <EditText android:id="@+id/dDw" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="SUTTER H"/>
+                <EditText android:id="@+id/dDh" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false"
+            android:layout_marginTop="6dp">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="RT H"/>
+                <EditText android:id="@+id/dDm" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="GLASS"/>
+                <EditText android:id="@+id/dDg" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="RP = W −"/>
+                <EditText android:id="@+id/dRpDed" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ============ RP ============ -->
+        <TextView style="@style/SecHead" android:text="RP GRILL  (BOTH SYSTEMS)"
+            android:textColor="#EC4899"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="MID GAP"/>
+                <EditText android:id="@+id/sRpGap" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="MIN SPACE"/>
+                <EditText android:id="@+id/sRpMin" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="MAX SPACE"/>
+                <EditText android:id="@+id/sRpMax" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+        <CheckBox android:id="@+id/cbRp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Include RP grill" android:checked="true"
+            android:layout_marginTop="6dp"/>
+    </LinearLayout>
+</ScrollView>

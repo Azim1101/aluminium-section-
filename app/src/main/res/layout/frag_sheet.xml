@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- ============ HEADER ROW ============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:elevation="2dp">
+
+            <TextView android:layout_width="0dp" android:layout_weight="0.9"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="No" android:textSize="10.5sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="2.3"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="H" android:textSize="12sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="2.3"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="W" android:textSize="12sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="1.2"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="Sut" android:textSize="10sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="1.1"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="Z/D" android:textSize="10sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="1.5"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="RP" android:textSize="10sp"
+                android:textStyle="bold" android:textColor="#FFFFFF"/>
+
+            <TextView android:layout_width="0dp" android:layout_weight="0.9"
+                android:layout_height="match_parent" android:background="@drawable/cell_head"
+                android:gravity="center" android:text="" android:textSize="10sp"/>
+        </LinearLayout>
+
+        <!-- ============ ROWS ============ -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical"/>
+
+        <!-- ============ ADD ROW ============ -->
+        <TextView
+            android:id="@+id/btnAddRow"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:background="#EEF3FB"
+            android:gravity="center"
+            android:text="+  ADD ROW"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:textColor="@color/acc"/>
+
+    </LinearLayout>
+
+    <!-- ============ FAB: OPTIMIZE ============ -->
+    <TextView
+        android:id="@+id/fabOptimize"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_fab"
+        android:gravity="center"
+        android:text="⚡"
+        android:textSize="24sp"
+        android:textColor="#FFFFFF"
+        android:elevation="8dp"/>
+
+</FrameLayout>
