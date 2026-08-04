@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.widget.Toast;
@@ -26,6 +27,20 @@ import java.util.Map;
 
 /** Excel export + WhatsApp share + Cutting image share */
 public class Exporter {
+
+    /** Round rect with different left/right corner radii (Canvas has no such method). */
+    private static void drawRoundRectSides(Canvas c, RectF r, float leftRad, float rightRad, Paint p) {
+        if (leftRad <= 0 && rightRad <= 0) { c.drawRect(r, p); return; }
+        float[] radii = {
+                leftRad, leftRad,     // top-left
+                rightRad, rightRad,   // top-right
+                rightRad, rightRad,   // bottom-right
+                leftRad, leftRad      // bottom-left
+        };
+        Path path = new Path();
+        path.addRoundRect(r, radii, Path.Direction.CW);
+        c.drawPath(path, p);
+    }
 
     /* ================= WHATSAPP TEXT ================= */
     public static String buildText(List<Engine.WinResult> res, Settings s,
@@ -209,7 +224,7 @@ public class Exporter {
                     c.drawRoundRect(r, j == 0 ? rad : 0, j == 0 ? rad : 0, pPipe);
                     if (j == bin.items.size() - 1) {
                         r.set(x, y, x + pw, y + barH);
-                        c.drawRoundRect(r, 0, 0, rad, rad, pPipe);
+                        drawRoundRectSides(c, r, 0, rad, pPipe);
                     }
 
                     // Separator

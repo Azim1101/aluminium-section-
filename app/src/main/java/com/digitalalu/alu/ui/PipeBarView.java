@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -61,6 +62,20 @@ public class PipeBarView extends View {
 
     private float dp(float v) { return v * getResources().getDisplayMetrics().density; }
 
+    /** Round rect with different left/right corner radii (Canvas has no such method). */
+    private static void drawRoundRectSides(Canvas c, RectF r, float leftRad, float rightRad, Paint p) {
+        if (leftRad <= 0 && rightRad <= 0) { c.drawRect(r, p); return; }
+        float[] radii = {
+                leftRad, leftRad,     // top-left
+                rightRad, rightRad,   // top-right
+                rightRad, rightRad,   // bottom-right
+                leftRad, leftRad      // bottom-left
+        };
+        Path path = new Path();
+        path.addRoundRect(r, radii, Path.Direction.CW);
+        c.drawPath(path, p);
+    }
+
     @Override
     protected void onMeasure(int w, int h) {
         // Compact: 28dp bar + 12dp label area = 40dp total
@@ -98,7 +113,7 @@ public class PipeBarView extends View {
             // Right round for last
             if (i == bin.items.size() - 1) {
                 r.set(x, barTop, x + pwActual, barTop + barH);
-                c.drawRoundRect(r, 0, 0, rad, rad, pFill);
+                drawRoundRectSides(c, r, 0, rad, pFill);
             }
 
             // Separator line
