@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView style="@style/SecHead" android:text="SIZE"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="HEIGHT"/>
+                <EditText android:id="@+id/dH" style="@style/FieldInput"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="WIDTH"/>
+                <EditText android:id="@+id/dW" style="@style/FieldInput"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:baselineAligned="false"
+            android:layout_marginTop="8dp">
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="SUTTER QTY"/>
+                <Spinner android:id="@+id/dSutter" android:layout_width="match_parent"
+                    android:layout_height="42dp" android:background="@drawable/bg_input"/>
+            </LinearLayout>
+            <LinearLayout style="@style/FieldBox">
+                <TextView style="@style/FieldLabel" android:text="NOS"/>
+                <EditText android:id="@+id/dNos" style="@style/FieldInput"
+                    android:inputType="number"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView style="@style/SecHead" android:text="NAME"/>
+        <EditText android:id="@+id/dName"
+            android:layout_width="match_parent" android:layout_height="42dp"
+            android:background="@drawable/bg_input" android:inputType="text"
+            android:textSize="14sp" android:padding="8dp" android:maxLines="1"/>
+
+        <TextView style="@style/SecHead" android:text="RP GRILL"/>
+        <Spinner android:id="@+id/dRp"
+            android:layout_width="match_parent" android:layout_height="42dp"
+            android:background="@drawable/bg_input"/>
+
+        <TextView
+            android:id="@+id/dResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="@drawable/bg_stat"
+            android:textSize="13sp"
+            android:textColor="@color/txt"
+            android:lineSpacingExtra="4dp"
+            android:fontFamily="monospace"/>
+    </LinearLayout>
+</ScrollView>

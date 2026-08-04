@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <!-- ============ TOP BAR ============ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/acc"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ALU WINDOW"
+                android:textColor="#FFFFFF"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.03"/>
+
+            <TextView
+                android:id="@+id/tvSub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 windows"
+                android:textColor="#CFE0FF"
+                android:textSize="11sp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnPrice"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_rupee"
+            android:contentDescription="Price"
+            app:tint="#FFFFFF"/>
+
+        <ImageButton
+            android:id="@+id/btnProfile"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_profile"
+            android:contentDescription="Customers"
+            app:tint="#FFFFFF"/>
+
+        <ImageButton
+            android:id="@+id/btnSettings"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_preferences"
+            android:contentDescription="Settings"
+            app:tint="#FFFFFF"/>
+
+        <ImageButton
+            android:id="@+id/btnMore"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_more"
+            android:contentDescription="More"
+            app:tint="#FFFFFF"/>
+    </LinearLayout>
+
+    <!-- ============ TABS ============ -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/card"
+        app:tabIndicatorColor="@color/acc"
+        app:tabIndicatorHeight="3dp"
+        app:tabSelectedTextColor="@color/acc"
+        app:tabTextColor="@color/mut"
+        app:tabMode="fixed"
+        app:tabTextAppearance="@style/TextAppearance.MaterialComponents.Button"/>
+
+    <!-- ============ CONTENT ============ -->
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- ============ BOTTOM ACTION BAR — WhatsApp | Excel ============ -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/card"
+        android:elevation="12dp"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <!-- WhatsApp icon button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnWhats"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="📤  WhatsApp"
+            android:textSize="13sp"
+            android:textColor="#25D366"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="12dp"
+            app:strokeColor="#25D366"/>
+
+        <!-- Excel icon button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExcel"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:text="📊  Excel"
+            android:textSize="13sp"
+            android:textColor="@color/ok"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/ok"/>
+    </LinearLayout>
+</LinearLayout>
