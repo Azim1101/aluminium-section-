@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Price system — PIN locked (default 1101).
+ * Price system — PIN locked (default xxxx).
  *
  * Pipe price:
  *   weight(kg) = length(inch) / 192 * kgPer16ft

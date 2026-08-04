@@ -15,19 +15,19 @@
         <LinearLayout style="@style/FieldBox">
             <TextView style="@style/FieldLabel" android:text="SHOP / COMPANY NAME"/>
             <EditText android:id="@+id/sBizName" style="@style/FieldInput"
-                android:hint="e.g. Digital Alu. Section"/>
+                android:hint="e.g. XXXX XXXX"/>
         </LinearLayout>
 
         <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
             <TextView style="@style/FieldLabel" android:text="ADDRESS"/>
             <EditText android:id="@+id/sBizAddr" style="@style/FieldInput"
-                android:hint="e.g. Wankaner 363621"/>
+                android:hint="e.g. XXXXXX XXXXXX"/>
         </LinearLayout>
 
         <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
             <TextView style="@style/FieldLabel" android:text="MOBILE NUMBER"/>
             <EditText android:id="@+id/sBizMobile" style="@style/FieldInput"
-                android:hint="e.g. 99799 71170"
+                android:hint="e.g. XXXXX XXXXX"
                 android:inputType="phone"/>
         </LinearLayout>
 
