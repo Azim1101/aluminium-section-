@@ -100,3 +100,12 @@ gradle assembleDebug
 ```
 
 Output APK: `app/build/outputs/apk/debug/app-debug.apk`
+
+### Automatic APK via GitHub Actions
+
+Har push par workflow (`.github/workflows/build-apk.yml`) automatically:
+
+1. **Debug + Release APK build** karta hai
+2. **GitHub Release** banata hai with APK attached (Releases page se download)
+
+Manual build ke liye: **Actions tab → "Build & Release APK" → Run workflow**
