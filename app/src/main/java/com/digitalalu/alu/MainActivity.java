@@ -757,8 +757,8 @@ public class MainActivity extends AppCompatActivity {
         m.getMenu().add("About");
         m.setOnMenuItemClickListener(mi -> {
             String t = mi.getTitle().toString();
-            if (t.startsWith("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
-            else if (t.startsWith("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
+            if (t.contains("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
+            else if (t.contains("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
             else if (t.startsWith("Save to")) saveToCustomer();
             else if (t.startsWith("Customer")) startActivityForResult(
                     new Intent(this, CustomerActivity.class), REQ_CUSTOMER);
