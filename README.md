@@ -17,6 +17,7 @@ and exports estimates via WhatsApp or Excel.
 - **Face Cutting / grain lock** — choose whether the first entered size follows sheet Height or Width; pattern-facing pieces never rotate
 - **RP Grill marking** — auto-suggests grill quantity and spacing with a visual ruler
 - **Costing engine** — weight-based pricing (kg per 16 ft × aluminium rate), glass cost, extra charges (per sutter / per window / per inch / per RP)
+- **Backup & Restore** — one-tap full backup (prices, customers, settings, formulas, work-in-progress) to a JSON file, restore on any phone
 - **Customer CRM** — save/load customer estimates with search, PIN locked
 - **Price manager** — viewing is open for everyone, **editing requires PIN**
 - **Excel export** — real `.xlsx` (opens in Excel / Google Sheets / WPS), shared via FileProvider
@@ -33,17 +34,27 @@ and exports estimates via WhatsApp or Excel.
 | **Default PIN** | **`1101`** |
 | Used for | Editing prices & rates, opening saved customer estimates |
 | Change it | **Price screen → "Change PIN"** (minimum 4 digits) |
-| Forgot PIN | Clear app data — it resets to the default `1101` |
+| Forgot PIN | Restore a backup file, or clear app data (resets to `1101`) |
 
 > Note: Price viewing is open; the PIN only protects *editing* and saved customer records.
+> Since v1.7 the PIN is stored only as a salted SHA-256 hash (never in plain text),
+> and one single PIN protects both the price editor and customer records.
+
+## Backup & Restore (new in v1.7)
+
+**Menu → "Backup data"** saves everything — rates, customer estimates, custom
+formulas, settings and current windows — into one JSON file you choose
+(keep it on Drive/WhatsApp/email). **Menu → "Restore data"** reads that file
+back on the same or a new phone. This means clearing app data or changing
+phones no longer loses any business data.
 
 ---
 
 ## Tech Stack
 
 - **Language**: Java 17
-- **Min SDK**: 21 (Android 5.0) · **Target/Compile SDK**: 34 (Android 14)
-- **Version**: 1.6 (versionCode 6)
+- **Min SDK**: 21 (Android 5.0) · **Target/Compile SDK**: 35 (Android 15)
+- **Version**: 1.7 (versionCode 7)
 - **UI**: XML layouts + programmatic views, Material components
 - **Persistence**: SharedPreferences (JSON-serialized)
 - **Dependencies**: AndroidX AppCompat 1.6.1, Material 1.11.0, RecyclerView 1.3.2, ConstraintLayout 2.1.4, Core 1.12.0
@@ -62,13 +73,16 @@ app/src/main/java/com/digitalalu/alu/
 │   ├── Engine.java          # Cut-length engine + bin-packing optimizer
 │   ├── ManualCuttingEngine.java # Manual pipe BFD + multi-pass MaxRects sheet nesting
 │   ├── Costing.java         # Cost calculation
-│   ├── PriceBook.java       # Rates, extras, PIN (DEFAULT_PIN = "1101")
+│   ├── PriceBook.java       # Rates, extras, salted-hash PIN (DEFAULT_PIN = "1101")
 │   ├── Settings.java        # Deductions, units, stock, business info
 │   ├── CustomFormulaManager.java  # Custom system formulas
+│   ├── BackupManager.java   # Full-app JSON backup & restore (v1.7)
 │   └── MathEvaluator.java   # Formula expression evaluator
 ├── export/
 │   ├── Exporter.java        # WhatsApp text + Excel export
 │   └── XlsxWriter.java      # Minimal real .xlsx (OOXML) writer
+├── util/
+│   └── SecurityUtil.java    # SHA-256 + salt helpers (PIN hashing, v1.7)
 ├── model/
 │   ├── Customer.java        # Customer record (name, mobile, village, note)
 │   └── WindowItem.java      # Window row (sizes, system, qty)
@@ -76,7 +90,8 @@ app/src/main/java/com/digitalalu/alu/
     ├── PipeBarView.java     # Visual pipe cutting bars
     ├── SheetLayoutView.java # Visual manual-sheet nesting plan
     ├── RowAdapter.java      # Window rows list
-    └── RpRulerView.java     # RP grill spacing ruler
+    ├── RpRulerView.java     # RP grill spacing ruler
+    └── InsetsHelper.java    # Android 15 edge-to-edge insets (v1.7)
 ```
 
 ---
@@ -113,6 +128,9 @@ Open the project in **Android Studio**, let Gradle sync, and run on a device/emu
 ```bash
 # with a local Gradle install (wrapper not committed in this repo)
 gradle assembleDebug
+
+# run the calculation-engine unit tests (also run automatically in CI)
+gradle test
 ```
 
 Output APK: `app/build/outputs/apk/debug/app-debug.apk`

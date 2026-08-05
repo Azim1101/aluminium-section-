@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.digitalalu.alu.model.WindowItem;
+import com.digitalalu.alu.util.SecurityUtil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +16,11 @@ import java.util.Map;
 
 /**
  * Price system — PIN locked (default 1101).
+ *
+ * Since v1.7 the PIN is stored only as a salted SHA-256 hash. Old installs
+ * that still carry a plain-text PIN keep working and are migrated
+ * automatically the first time the correct PIN is entered (call save()
+ * after a successful checkPin to persist the migration).
  *
  * Pipe price:
  *   weight(kg) = length(inch) / 192 * kgPer16ft
@@ -30,7 +36,13 @@ public class PriceBook {
 
     private static final String P = "alu_price";
 
-    public String pin = DEFAULT_PIN;
+    /** Salted SHA-256 of the PIN (empty = legacy plain-text mode). */
+    public String pinHash = "";
+    public String pinSalt = "";
+
+    /** Plain-text PIN from a pre-v1.7 install; never saved again once used. */
+    private String legacyPin = null;
+
     public double aluRate = 450;      // Rs per kg
     public double glassRate = 80;     // Rs per sq.ft
 
@@ -99,11 +111,44 @@ public class PriceBook {
         return weight(type, lengthInch) * aluRate;
     }
 
+    /* ---------------- PIN (salted hash since v1.7) ---------------- */
+
+    /** True when the PIN is already stored as a hash (v1.7+ format). */
+    public boolean hasHashedPin() { return pinHash != null && !pinHash.isEmpty(); }
+
+    /**
+     * Checks the entered PIN. In legacy mode a successful check upgrades the
+     * PIN to the hashed format in memory — call save() to persist it.
+     */
+    public boolean checkPin(String input) {
+        if (input == null) return false;
+        String s = input.trim();
+        if (hasHashedPin()) {
+            return SecurityUtil.equals(SecurityUtil.sha256(pinSalt + s), pinHash);
+        }
+        String legacy = legacyPin != null ? legacyPin : DEFAULT_PIN;
+        if (SecurityUtil.equals(s, legacy)) {
+            setPin(s);                 // auto-migrate away from plain text
+            return true;
+        }
+        return false;
+    }
+
+    /** Sets a new PIN (stored only as salt + SHA-256 hash). */
+    public void setPin(String newPin) {
+        String s = newPin == null ? "" : newPin.trim();
+        pinSalt = SecurityUtil.randomSalt();
+        pinHash = SecurityUtil.sha256(pinSalt + s);
+        legacyPin = null;
+    }
+
     /* ---------------- persistence ---------------- */
     public void save(Context c) {
         try {
             JSONObject o = new JSONObject();
-            o.put("pin", pin);
+            // v1.7+: only the salted hash is persisted — never the PIN itself.
+            o.put("pinHash", pinHash);
+            o.put("pinSalt", pinSalt);
             o.put("aluRate", aluRate);
             o.put("glassRate", glassRate);
             JSONObject k = new JSONObject();
@@ -129,7 +174,13 @@ public class PriceBook {
             String s = sp.getString("data", null);
             if (s == null) return p;
             JSONObject o = new JSONObject(s);
-            p.pin = o.optString("pin", DEFAULT_PIN);
+            p.pinHash = o.optString("pinHash", "");
+            p.pinSalt = o.optString("pinSalt", "");
+            if (!p.hasHashedPin()) {
+                // Pre-v1.7 data: keep the old plain-text PIN in memory only.
+                // It disappears from storage after the next successful unlock.
+                p.legacyPin = o.optString("pin", DEFAULT_PIN);
+            }
             p.aluRate = o.optDouble("aluRate", 450);
             p.glassRate = o.optDouble("glassRate", 80);
             JSONObject k = o.optJSONObject("kg");

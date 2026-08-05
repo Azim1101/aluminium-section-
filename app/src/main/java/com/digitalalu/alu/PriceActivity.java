@@ -78,6 +78,7 @@ public class PriceActivity extends AppCompatActivity {
         root.addView(sc);
 
         setContentView(root);
+        com.digitalalu.alu.ui.InsetsHelper.apply(root, top);
         render();
     }
 
@@ -93,7 +94,8 @@ public class PriceActivity extends AppCompatActivity {
                 .create();
         d.show();
         d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x -> {
-            if (et.getText().toString().trim().equals(pb.pin)) {
+            if (pb.checkPin(et.getText().toString())) {
+                pb.save(this);   // persists legacy → hashed PIN migration
                 unlocked = true;
                 tvLock.setText("\uD83D\uDD13  UNLOCKED");
                 tvLock.setTextColor(0xFF86EFAC);
@@ -327,7 +329,7 @@ public class PriceActivity extends AppCompatActivity {
                 .setPositiveButton("Save", (d, w) -> {
                     String s = et.getText().toString().trim();
                     if (s.length() < 4) { toast("PIN must be at least 4 digits"); return; }
-                    pb.pin = s;
+                    pb.setPin(s);
                     pb.save(this);
                     toast("PIN changed");
                 })

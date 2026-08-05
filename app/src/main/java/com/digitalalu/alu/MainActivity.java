@@ -31,9 +31,12 @@ import com.digitalalu.alu.calc.CustomFormulaManager;
 import com.digitalalu.alu.calc.Costing;
 import com.digitalalu.alu.calc.PriceBook;
 import com.digitalalu.alu.export.Exporter;
+import com.digitalalu.alu.calc.BackupManager;
 import com.digitalalu.alu.model.Customer;
 import android.content.Intent;
+import android.net.Uri;
 import com.digitalalu.alu.model.WindowItem;
+import com.digitalalu.alu.ui.InsetsHelper;
 import com.digitalalu.alu.ui.PipeBarView;
 import com.digitalalu.alu.ui.RpRulerView;
 import com.digitalalu.alu.ui.RowAdapter;
@@ -43,7 +46,10 @@ import com.google.android.material.tabs.TabLayout;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean showPrice = false;
     private Costing.Total cost;
     private static final int REQ_CUSTOMER = 101;
+    private static final int REQ_BACKUP_EXPORT = 201;
+    private static final int REQ_BACKUP_IMPORT = 202;
     private ScrollView scResult, scPlan;
     private LinearLayout boxResult, boxPlan;
 
@@ -83,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         st = Settings.load(this);
         CustomFormulaManager.activeSystems = CustomFormulaManager.getSystems(this);
         pb = PriceBook.load(this);
+        InsetsHelper.apply(((ViewGroup) findViewById(android.R.id.content)).getChildAt(0),
+                findViewById(R.id.topBar));
         container = findViewById(R.id.container);
         tabs = findViewById(R.id.tabs);
         tvSub = findViewById(R.id.tvSub);
@@ -130,6 +140,12 @@ public class MainActivity extends AppCompatActivity {
         if (req == REQ_CUSTOMER && res == RESULT_OK && data != null) {
             long id = data.getLongExtra(CustomerActivity.EXTRA_LOAD_ID, -1);
             loadCustomer(id);
+        } else if (req == REQ_BACKUP_EXPORT && res == RESULT_OK
+                && data != null && data.getData() != null) {
+            writeBackup(data.getData());
+        } else if (req == REQ_BACKUP_IMPORT && res == RESULT_OK
+                && data != null && data.getData() != null) {
+            confirmRestore(data.getData());
         }
     }
 
@@ -732,6 +748,8 @@ public class MainActivity extends AppCompatActivity {
         m.getMenu().add("Price system");
         m.getMenu().add("Manual PCO & Sheet Cutting");
         m.getMenu().add("Share cutting images");
+        m.getMenu().add("Backup data");
+        m.getMenu().add("Restore data");
         m.getMenu().add("Clear all");
         m.getMenu().add("Formula");
         m.getMenu().add("About");
@@ -743,12 +761,81 @@ public class MainActivity extends AppCompatActivity {
             else if (t.startsWith("Price")) startActivity(new Intent(this, PriceActivity.class));
             else if (t.startsWith("Manual PCO")) startActivity(new Intent(this, ManualCuttingActivity.class));
             else if (t.startsWith("Share cutting")) shareAllCuttingImages();
+            else if (t.startsWith("Backup")) backupData();
+            else if (t.startsWith("Restore")) restoreData();
             else if (t.startsWith("Clear")) confirmClear();
             else if (t.startsWith("Formula")) showFormula();
             else showAbout();
             return true;
         });
         m.show();
+    }
+
+    /* ================= BACKUP / RESTORE ================= */
+    private void backupData() {
+        Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("application/json");
+        i.putExtra(Intent.EXTRA_TITLE, "alu-window-backup.json");
+        startActivityForResult(i, REQ_BACKUP_EXPORT);
+    }
+
+    private void restoreData() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("*/*");
+        i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                "application/json", "application/octet-stream", "text/plain"});
+        startActivityForResult(i, REQ_BACKUP_IMPORT);
+    }
+
+    private void writeBackup(Uri uri) {
+        try {
+            JSONObject doc = BackupManager.exportAll(this);
+            OutputStream os = getContentResolver().openOutputStream(uri);
+            os.write(doc.toString(2).getBytes("UTF-8"));
+            os.close();
+            toast("Backup saved \u2714  (keep this file safe)");
+        } catch (Exception e) {
+            toast("Backup failed: " + e.getMessage());
+        }
+    }
+
+    private void confirmRestore(final Uri uri) {
+        final JSONObject doc;
+        try {
+            InputStream is = getContentResolver().openInputStream(uri);
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            byte[] buf = new byte[8192];
+            int n;
+            while ((n = is.read(buf)) > 0) bo.write(buf, 0, n);
+            is.close();
+            doc = new JSONObject(bo.toString("UTF-8"));
+            BackupManager.validate(doc);
+        } catch (Exception e) {
+            toast("Not a valid ALU backup file");
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Restore backup?")
+                .setMessage("Backup date: " + doc.optString("date", "?")
+                        + "\n\nCurrent data (prices, customers, settings, formulas) "
+                        + "will be REPLACED by this backup. Continue?")
+                .setPositiveButton("Restore", (d, w) -> {
+                    try {
+                        BackupManager.Result r = BackupManager.importAll(this, doc);
+                        CustomFormulaManager.invalidateCache();
+                        toast("Restored " + r.keyCount + " values — restarting app");
+                        Intent i = new Intent(this, MainActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
+                        finish();
+                    } catch (Exception e) {
+                        toast("Restore failed: " + e.getMessage());
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void confirmClear() {
