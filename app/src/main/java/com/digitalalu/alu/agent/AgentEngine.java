@@ -200,27 +200,9 @@ public class AgentEngine {
 
         // ----- User Profile -----
         addRule(new Rule(
-            new String[]{"my profile", "user profile", "mera profile", "profile kya", "owner profile", "apna profile", "profile update"],
-            (input) -> {
-                UserProfile p = UserProfile.load(context);
-                if (p.isEmpty()) {
-                    return "Profile abhi set nahi hai!\n\n" +
-                           "Menu \u2192 \"My Profile\" se set karo:\n" +
-                           "\u2022 Name\n" +
-                           "\u2022 Mobile Number\n" +
-                           "\u2022 Address\n\n" +
-                           "Profile mein aapki company/dukaan ki details save hongi.";
-                }
-                StringBuilder sb = new StringBuilder();
-                sb.append("\uD83D\uDC64 **Aapka Profile:**\n\n");
-                sb.append("Name: ").append(p.name.isEmpty() ? "-" : p.name).append("\n");
-                sb.append("Mobile: ").append(p.mobile.isEmpty() ? "-" : p.mobile).append("\n");
-                sb.append("Address: ").append(p.address.isEmpty() ? "-" : p.address).append("\n");
-                sb.append("\nMenu \u2192 \"My Profile\" se update kar sakte ho!");
-                return sb.toString();
-            }
+            new String[]{"my profile", "user profile", "mera profile", "profile kya", "owner profile", "apna profile", "profile update"},
+            (input) -> getProfileResponse()
         ));
-
         // ----- Backup -----
         addRule(new Rule(
             new String[]{"backup", "backup kaise", "data save", "data backup", "data kahan"},
@@ -456,5 +438,24 @@ public class AgentEngine {
             "Different words mein poochhiye ya \"help\" likhiye!"
         };
         return fallbacks[new Random().nextInt(fallbacks.length)];
+    }
+
+    private String getProfileResponse() {
+        UserProfile p = UserProfile.load(context);
+        if (p.isEmpty()) {
+            return "Profile abhi set nahi hai!\n\n" +
+                   "Menu \u2192 \"My Profile\" se set karo:\n" +
+                   "\u2022 Name\n" +
+                   "\u2022 Mobile Number\n" +
+                   "\u2022 Address\n\n" +
+                   "Profile mein aapki company/dukaan ki details save hongi.";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("\uD83D\uDC64 **Aapka Profile:**\n\n");
+        sb.append("Name: ").append(p.name.isEmpty() ? "-" : p.name).append("\n");
+        sb.append("Mobile: ").append(p.mobile.isEmpty() ? "-" : p.mobile).append("\n");
+        sb.append("Address: ").append(p.address.isEmpty() ? "-" : p.address).append("\n");
+        sb.append("\nMenu \u2192 \"My Profile\" se update kar sakte ho!");
+        return sb.toString();
     }
 }
