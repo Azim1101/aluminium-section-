@@ -64,6 +64,12 @@ public class CustomFormulaManager {
         return cachedSystems;
     }
 
+    /** Clears the in-memory cache (used after restoring a backup). */
+    public static void invalidateCache() {
+        cachedSystems = null;
+        activeSystems = null;
+    }
+
     public static void saveSystems(Context ctx, List<CustomSystem> systems) {
         cachedSystems = systems;
         SharedPreferences prefs = ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);

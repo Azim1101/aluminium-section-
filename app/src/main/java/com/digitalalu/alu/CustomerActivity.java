@@ -34,11 +34,13 @@ public class CustomerActivity extends AppCompatActivity {
     private List<Customer> list;
     private LinearLayout box;
     private boolean unlocked = false;
+    private com.digitalalu.alu.calc.PriceBook pb;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         list = Customer.loadAll(this);
+        pb = com.digitalalu.alu.calc.PriceBook.load(this);
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -71,6 +73,7 @@ public class CustomerActivity extends AppCompatActivity {
         sc.setLayoutParams(new LinearLayout.LayoutParams(-1, 0, 1f));
         root.addView(sc);
         setContentView(root);
+        com.digitalalu.alu.ui.InsetsHelper.apply(root, top);
 
         askPin();
     }
@@ -90,7 +93,8 @@ public class CustomerActivity extends AppCompatActivity {
                 .create();
         d.show();
         d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(x -> {
-            if (et.getText().toString().trim().equals(Customer.getPin(this))) {
+            if (pb.checkPin(et.getText().toString())) {
+                pb.save(this);   // persists legacy → hashed PIN migration
                 unlocked = true;
                 d.dismiss();
                 render();

@@ -79,6 +79,9 @@ public class ManualCuttingActivity extends AppCompatActivity {
         st = Settings.load(this);
         loadData();
         setContentView(R.layout.activity_manual_cutting);
+        com.digitalalu.alu.ui.InsetsHelper.apply(
+                ((android.view.ViewGroup) findViewById(android.R.id.content)).getChildAt(0),
+                findViewById(R.id.topBar));
 
         ((TextView) findViewById(R.id.tvManualUnit)).setText(
                 "Enter all sizes in " + (st.mm ? "millimeters (mm)" : "inches (\")"));

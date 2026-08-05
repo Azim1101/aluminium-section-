@@ -80,12 +80,9 @@ public class Customer {
         } catch (Exception ignored) {}
     }
 
-    /* PIN for customer section */
-    public static String getPin(Context ctx) {
-        return ctx.getSharedPreferences(P, Context.MODE_PRIVATE)
-                .getString("pin", com.digitalalu.alu.calc.PriceBook.DEFAULT_PIN);
-    }
-    public static void setPin(Context ctx, String pin) {
-        ctx.getSharedPreferences(P, Context.MODE_PRIVATE).edit().putString("pin", pin).apply();
-    }
+    /*
+     * PIN note (v1.7): the customer section uses the single app PIN from
+     * PriceBook (salted hash). The old per-section plain-text "pin" pref is
+     * no longer read or written.
+     */
 }
