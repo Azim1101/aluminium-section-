@@ -16,3 +16,5 @@ local.properties
 /signing/
 /signing.properties
 /RELEASE_KEY_BACKUP.txt
+/GITHUB_ACTIONS_SECRETS_TO_COPY.txt
+/NEW_GITHUB_ACTIONS_SECRETS_TO_COPY.txt

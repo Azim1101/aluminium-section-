@@ -43,7 +43,7 @@ and exports estimates via WhatsApp or Excel.
 
 - **Language**: Java 17
 - **Min SDK**: 21 (Android 5.0) · **Target/Compile SDK**: 34 (Android 14)
-- **Version**: 1.5 (versionCode 5)
+- **Version**: 1.6 (versionCode 6)
 - **UI**: XML layouts + programmatic views, Material components
 - **Persistence**: SharedPreferences (JSON-serialized)
 - **Dependencies**: AndroidX AppCompat 1.6.1, Material 1.11.0, RecyclerView 1.3.2, ConstraintLayout 2.1.4, Core 1.12.0

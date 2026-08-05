@@ -852,7 +852,7 @@ public class MainActivity extends AppCompatActivity {
     private void showAbout() {
         String bizInfo = st.bizHeader();
         String footer = st.bizFooter();
-        String about = "Native Android app\nVersion 1.5\n\n"
+        String about = "Native Android app\nVersion 1.6\n\n"
                 + "Best Fit Decreasing (BFD)\npipe cutting optimization\n\n";
         if (!footer.isEmpty()) {
             about += footer + "\n\n";
