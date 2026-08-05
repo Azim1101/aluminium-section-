@@ -1,4 +1,38 @@
+import java.util.Properties
+
 plugins { id 'com.android.application' }
+
+/*
+ * Release signing is deliberately kept outside version control.
+ * Local builds read signing.properties; GitHub Actions reads the same values
+ * from repository secrets. This makes every release use one permanent key.
+ */
+def signingProperties = new Properties()
+def signingPropertiesFile = rootProject.file("signing.properties")
+if (signingPropertiesFile.exists()) {
+    signingPropertiesFile.withInputStream { stream -> signingProperties.load(stream) }
+}
+
+def signingValue = { String key ->
+    def environmentValue = System.getenv(key)
+    if (environmentValue != null && !environmentValue.trim().isEmpty()) return environmentValue
+    return signingProperties.getProperty(key)
+}
+
+def releaseStorePath = signingValue("ALU_KEYSTORE_FILE")
+def releaseStorePassword = signingValue("ALU_KEYSTORE_PASSWORD")
+def releaseKeyAlias = signingValue("ALU_KEY_ALIAS")
+def releaseKeyPassword = signingValue("ALU_KEY_PASSWORD")
+def releaseSigningReady = releaseStorePath && releaseStorePassword && releaseKeyAlias
+        && releaseKeyPassword && rootProject.file(releaseStorePath).exists()
+
+def releaseTaskRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName.toLowerCase().contains("release")
+}
+if (releaseTaskRequested && !releaseSigningReady) {
+    throw new GradleException("Release signing is not configured. Add signing.properties locally "
+            + "or set ALU_KEYSTORE_FILE, ALU_KEYSTORE_PASSWORD, ALU_KEY_ALIAS and ALU_KEY_PASSWORD.")
+}
 
 android {
     namespace 'com.digitalalu.alu'
@@ -8,12 +42,28 @@ android {
         applicationId "com.digitalalu.alu"
         minSdk 21
         targetSdk 34
-        versionCode 3
-        versionName "1.3"
+        versionCode 5
+        versionName "1.5"
     }
+
+    signingConfigs {
+        release {
+            if (releaseSigningReady) {
+                storeFile rootProject.file(releaseStorePath)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
-        release { minifyEnabled false; signingConfig signingConfigs.debug }
+        release {
+            minifyEnabled false
+            if (releaseSigningReady) signingConfig signingConfigs.release
+        }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

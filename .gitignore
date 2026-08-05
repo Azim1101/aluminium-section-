@@ -11,3 +11,8 @@ local.properties
 *.zip
 *.apk
 *.aab
+
+# Never commit a signing key, its passwords, or its backup text.
+/signing/
+/signing.properties
+/RELEASE_KEY_BACKUP.txt

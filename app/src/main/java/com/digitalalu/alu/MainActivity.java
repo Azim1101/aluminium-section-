@@ -536,6 +536,16 @@ public class MainActivity extends AppCompatActivity {
         headerCard.body.addView(kv("Waste", String.format(Locale.US, "%.1f%%", grand.wastePct())
                 + "  (" + st.fmtU(grand.waste) + ")"));
 
+        TextView btnManual = new TextView(this);
+        btnManual.setText("✂  OPEN MANUAL PCO & SHEET CUTTING");
+        btnManual.setTextSize(12.5f);
+        btnManual.setTypeface(null, Typeface.BOLD);
+        btnManual.setTextColor(0xFF16A34A);
+        btnManual.setGravity(Gravity.CENTER);
+        btnManual.setPadding(0, dp(9), 0, dp(4));
+        btnManual.setOnClickListener(v -> startActivity(new Intent(this, ManualCuttingActivity.class)));
+        headerCard.body.addView(btnManual);
+
         // Share all cutting images button
         TextView btnShareAll = new TextView(this);
         btnShareAll.setText("\uD83D\uDCF7  SHARE ALL CUTTING IMAGES");
@@ -720,6 +730,7 @@ public class MainActivity extends AppCompatActivity {
         m.getMenu().add("Save to customer");
         m.getMenu().add("Customer records");
         m.getMenu().add("Price system");
+        m.getMenu().add("Manual PCO & Sheet Cutting");
         m.getMenu().add("Share cutting images");
         m.getMenu().add("Clear all");
         m.getMenu().add("Formula");
@@ -730,6 +741,7 @@ public class MainActivity extends AppCompatActivity {
             else if (t.startsWith("Customer")) startActivityForResult(
                     new Intent(this, CustomerActivity.class), REQ_CUSTOMER);
             else if (t.startsWith("Price")) startActivity(new Intent(this, PriceActivity.class));
+            else if (t.startsWith("Manual PCO")) startActivity(new Intent(this, ManualCuttingActivity.class));
             else if (t.startsWith("Share cutting")) shareAllCuttingImages();
             else if (t.startsWith("Clear")) confirmClear();
             else if (t.startsWith("Formula")) showFormula();
@@ -840,7 +852,7 @@ public class MainActivity extends AppCompatActivity {
     private void showAbout() {
         String bizInfo = st.bizHeader();
         String footer = st.bizFooter();
-        String about = "Native Android app\nVersion 2.0\n\n"
+        String about = "Native Android app\nVersion 1.5\n\n"
                 + "Best Fit Decreasing (BFD)\npipe cutting optimization\n\n";
         if (!footer.isEmpty()) {
             about += footer + "\n\n";

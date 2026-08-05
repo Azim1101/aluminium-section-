@@ -28,6 +28,7 @@ public class PipeBarView extends View {
 
     private final Paint pFill = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pWaste = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pKerf = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pTextWhite = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pTextDark = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pTextLabel = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -40,6 +41,8 @@ public class PipeBarView extends View {
 
     private void init() {
         pWaste.setColor(0xFFE2E8F0);
+        // Blade kerf is a thin white gap between coloured cut pieces.
+        pKerf.setColor(0xFFFFFFFF);
         pTextWhite.setColor(Color.WHITE);
         pTextWhite.setTextAlign(Paint.Align.CENTER);
         pTextWhite.setFakeBoldText(true);
@@ -97,6 +100,14 @@ public class PipeBarView extends View {
         pTextWhite.setTextSize(dp(9));
         pTextLabel.setTextSize(dp(7));
 
+        // bin.used includes blade kerf. Derive the kerf from the packed data so
+        // it appears as a real gap instead of being mistaken for leftover waste.
+        double rawTotal = 0;
+        for (Engine.Piece p : bin.items) rawTotal += p.len;
+        double kerfTotal = Math.max(0, bin.used - rawTotal);
+        float kerfGap = bin.items.size() > 1
+                ? (float) ((kerfTotal / (bin.items.size() - 1)) / stock) * W : 0;
+
         float x = 0;
         for (int i = 0; i < bin.items.size(); i++) {
             Engine.Piece p = bin.items.get(i);
@@ -105,9 +116,6 @@ public class PipeBarView extends View {
 
             // Draw colored segment
             pFill.setColor(color);
-            float segRad = 0;
-            if (i == 0) segRad = rad;
-            if (i == bin.items.size() - 1) segRad = rad;
             r.set(x, barTop, x + pwActual, barTop + barH);
             c.drawRoundRect(r, i == 0 ? rad : 0, i == 0 ? rad : 0, pFill);
             // Right round for last
@@ -141,6 +149,10 @@ public class PipeBarView extends View {
             }
 
             x += pwActual;
+            if (i < bin.items.size() - 1 && kerfGap > 0) {
+                c.drawRect(x, barTop, x + kerfGap, barTop + barH, pKerf);
+                x += kerfGap;
+            }
         }
 
         // Draw waste label on remaining area
