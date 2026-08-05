@@ -34,6 +34,7 @@ public final class BackupManager {
             "custom_formulas",     // custom pipe systems
             "alu_data",            // MainActivity work-in-progress windows
             "manual_cutting_v1",   // ManualCuttingActivity workspace
+            "alu_user_profile",    // User profile (name, mobile, address)
     };
 
     public static final int FORMAT_VERSION = 1;

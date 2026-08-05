@@ -743,6 +743,8 @@ public class MainActivity extends AppCompatActivity {
     /* ================= MENU ================= */
     private void showMenu(View anchor) {
         PopupMenu m = new PopupMenu(this, anchor);
+        m.getMenu().add("\uD83E\uDD16 AI Agent (Chat)");
+        m.getMenu().add("\uD83D\uDC64 My Profile");
         m.getMenu().add("Save to customer");
         m.getMenu().add("Customer records");
         m.getMenu().add("Price system");
@@ -755,7 +757,9 @@ public class MainActivity extends AppCompatActivity {
         m.getMenu().add("About");
         m.setOnMenuItemClickListener(mi -> {
             String t = mi.getTitle().toString();
-            if (t.startsWith("Save to")) saveToCustomer();
+            if (t.startsWith("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
+            else if (t.startsWith("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
+            else if (t.startsWith("Save to")) saveToCustomer();
             else if (t.startsWith("Customer")) startActivityForResult(
                     new Intent(this, CustomerActivity.class), REQ_CUSTOMER);
             else if (t.startsWith("Price")) startActivity(new Intent(this, PriceActivity.class));

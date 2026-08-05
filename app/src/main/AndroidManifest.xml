@@ -25,6 +25,9 @@
         <activity android:name=".CustomerActivity" android:exported="false"/>
         <activity android:name=".ManualCuttingActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".UserProfileActivity" android:exported="false"/>
+        <activity android:name=".AgentActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
