@@ -15,9 +15,18 @@ public class AgentEngine {
     private final Context context;
     private final List<Rule> rules = new ArrayList<>();
 
+    public AgentEngine() {
+        this(null);
+    }
+
     public AgentEngine(Context context) {
         this.context = context;
         buildKnowledgeBase();
+    }
+
+    private UserProfile loadProfile() {
+        if (context == null) return new UserProfile();
+        return UserProfile.load(context);
     }
 
     /** Process user input and return agent response */
@@ -42,7 +51,7 @@ public class AgentEngine {
 
     /** Get initial greeting message */
     public String getGreeting() {
-        UserProfile profile = UserProfile.load(context);
+        UserProfile profile = loadProfile();
         String name = profile.name.isEmpty() ? "" : " " + profile.name;
         return "Namaste" + name + "!\uD83D\uDE4F\n\n" +
                "Main aapka ALU Assistant hoon. Aap mujhse yeh sab poochh sakte ho:\n\n" +
@@ -410,7 +419,7 @@ public class AgentEngine {
     // ======================== HELPERS ========================
 
     private String[] greetings() {
-        UserProfile p = UserProfile.load(context);
+        UserProfile p = loadProfile();
         String name = p.name.isEmpty() ? "" : " " + p.name;
         return new String[]{
             "Namaste" + name + "! \uD83D\uDE4F Bataiye, kya help chahiye?",
@@ -441,7 +450,7 @@ public class AgentEngine {
     }
 
     private String getProfileResponse() {
-        UserProfile p = UserProfile.load(context);
+        UserProfile p = loadProfile();
         if (p.isEmpty()) {
             return "Profile abhi set nahi hai!\n\n" +
                    "Menu \u2192 \"My Profile\" se set karo:\n" +
