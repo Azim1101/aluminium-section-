@@ -90,6 +90,77 @@ public class AgentEngineTest {
     }
 
     @Test
+    public void naturalHinglishPhrasesResolve() {
+        // These are the kind of free-typed messages users actually send.
+        String[][] queries = {
+                {"app kya kaam karta hai", "ALU Window"},
+                {"sutter ka size kitna hota hai", "Sutter"},
+                {"muliya kya hota hai", "Muliya"},
+                {"pipe kaise katenge", "Pipe Cutting Plan"},
+                {"price kaise set kare", "Price System"},
+                {"grahak kaise save kare", "Customer Records"},
+                {"data backup kaise le", "Data Backup"},
+                {"domal kya hota hai", "DOMAL"},
+                {"zed kya hai", "ZED"},
+                {"rp kya hai", "RP"},
+                {"section kya hai", "sections"},
+                {"kaunse system hai", "window systems"},
+                {"tum kaun ho", "ALU Assistant"},
+                {"shukriya bhai", "swagat"},
+                {"alvida", "Alvida"},
+                {"units kaise change kare", "Units"},
+                {"waste kitna hota hai", "Waste"},
+                {"formula kaise banaye", "Custom Formulas"},
+                {"pco kya hai", "Manual PCO"},
+                {"excel kaise export kare", "Excel Export"},
+                {"madad chahiye", "help"},
+        };
+        for (String[] qa : queries) {
+            String reply = engine.respond(qa[0]);
+            assertFalse("fell back: " + qa[0] + " -> " + reply, isFallback(reply));
+            assertTrue("expected to mention '" + qa[1] + "' for: " + qa[0]
+                            + " -> " + reply,
+                    lower(reply).contains(lower(qa[1])));
+        }
+    }
+
+    @Test
+    public void punctuationIsIgnored() {
+        String a = engine.respond("Sutter kya hai?");
+        String b = engine.respond("sutter kya hai");
+        assertEquals(lower(a), lower(b));
+        assertFalse(isFallback(a));
+    }
+
+    @Test
+    public void shortWordDoesNotMatchInsideAnotherWord() {
+        // Regression: "mm" used to match inside "hmm" via substring contains().
+        // "hmm" is not a real word in any rule -> fallback is acceptable;
+        // the important thing is that "units inch ya mm" must NOT be treated
+        // as a greeting just because "hmm" contains... nothing relevant.
+        String units = engine.respond("units inch ya mm");
+        assertFalse(isFallback(units));
+        assertTrue(lower(units).contains("inch"));
+        assertTrue(lower(units).contains("mm"));
+    }
+
+    @Test
+    public void devanagariHindiIsMatched() {
+        // नमस्ते = namaste
+        String reply = engine.respond("नमस्ते");
+        assertFalse(isFallback(reply));
+        assertTrue(lower(reply).contains("namaste") || lower(reply).contains("hello")
+                || lower(reply).contains("hi"));
+    }
+
+    @Test
+    public void normalizeHandlesNullAndPunctuation() {
+        assertEquals("", AgentEngine.normalize(null));
+        assertEquals("", AgentEngine.normalize("   "));
+        assertEquals("sutter kya hai", AgentEngine.normalize("  Sutter, KYA hai?! "));
+    }
+
+    @Test
     public void unknownQuestionUsesFallback() {
         String reply = engine.respond("xyzzy flooobar quantum entanglement 12345");
         assertTrue("expected fallback, got: " + reply, isFallback(reply));

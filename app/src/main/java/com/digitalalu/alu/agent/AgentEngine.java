@@ -31,22 +31,44 @@ public class AgentEngine {
 
     /** Process user input and return agent response */
     public String respond(String userInput) {
-        if (userInput == null) userInput = "";
-        String input = userInput.trim().toLowerCase();
+        String input = normalize(userInput);
 
         if (input.isEmpty()) {
             return pickRandom(greetings());
         }
 
-        // Check each rule
+        // Score every rule and pick the best match (more keyword words = better).
+        Rule best = null;
+        int bestScore = 0;
         for (Rule rule : rules) {
-            if (rule.matches(input)) {
-                return rule.respond(input);
+            int score = rule.score(input);
+            if (score > bestScore) {
+                bestScore = score;
+                best = rule;
             }
+        }
+
+        if (best != null) {
+            return best.respond(input);
         }
 
         // Default fallback
         return fallback(input);
+    }
+
+    /**
+     * Normalize user text: null-safe, lowercase, punctuation/extra spaces
+     * collapsed. Words are kept so rule matching can use word boundaries.
+     */
+    static String normalize(String s) {
+        if (s == null) return "";
+        // Replace anything that is not a letter/digit/whitespace with a space,
+        // then collapse whitespace. Devanagari letters are preserved by \p{L}.
+        String t = s.toLowerCase(java.util.Locale.US)
+                .replaceAll("[^\\p{L}\\p{N}\\s]+", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+        return t;
     }
 
     /** Get initial greeting message */
@@ -71,19 +93,30 @@ public class AgentEngine {
 
         // ----- Greetings -----
         addRule(new Rule(
-            new String[]{"hi", "hello", "hey", "namaste", "namaskar", "hlo", "hii"},
+            new String[]{"hi", "hello", "hey", "namaste", "namaskar", "namaskaram",
+                         "hlo", "hii", "helo", "salaam", "salam", "ram ram",
+                         "good morning", "good evening", "good night", "kya hal",
+                         "kya haal hai", "kya haal", "kaise hain"},
             (input) -> pickRandom(greetings())
         ));
 
-        // ----- How are you -----
+        // ----- How are you (moved after greetings; phrase matching disambiguates) -----
         addRule(new Rule(
-            new String[]{"how are you", "kaise ho", "kaisa hai", "kaise ho bhai", "kya haal"},
+            new String[]{"how are you", "how r u", "kaise ho aap", "kaisi ho",
+                         "kya haal hai", "kya hal hai", "kya chala", "kya chal raha",
+                         "kya ho raha"},
             (input) -> "Main bilkul theek hoon! \uD83D\uDE0A Aap bataiye, aluminium ka kaam kaisa chal raha hai?"
         ));
 
         // ----- App info -----
         addRule(new Rule(
-            new String[]{"app kya hai", "app ke baare", "about app", "what is this app", "ye app", "ye kya hai", "app ka naam"},
+            new String[]{"app kya hai", "app ke baare", "app ke bare", "app kya ha",
+                         "app kya he", "yeh app", "ye app", "is app", "iss app",
+                         "app kya karta", "app ka kaam", "app ka naam", "app features",
+                         "about app", "what is this app", "what app", "ye kya hai",
+                         "yeh kya hai", "kya hai app", "application", "app explain",
+                         "app ke features", "app ke baare mein", "app ke bare mein",
+                         "app kya kam karta", "app kya kaam karta"},
             (input) -> "Yeh **ALU Window** app hai! \uD83D\uDEE0\n\n" +
                 "Yeh aluminium window/door manufacturers ke liye banaya gaya hai.\n\n" +
                 "Features:\n" +
@@ -99,7 +132,10 @@ public class AgentEngine {
 
         // ----- Window types -----
         addRule(new Rule(
-            new String[]{"window types", "window ka type", "kitne type", "types of window", "window system", "system types"},
+            new String[]{"window types", "window ka type", "window ke type", "kitne type",
+                         "kitne tarah", "types of window", "window system", "system types",
+                         "kaunse system", "konse system", "which system", "which windows",
+                         "window kitne", "systems", "window systems"},
             (input) -> "App mein yeh window systems hain:\n\n" +
                 "\uD83D\uDD35 **ZED (Single Track)** — Standard single slider window\n" +
                 "\uD83D\uDFE2 **ZED (Double Track)** — Double track sliding window\n" +
@@ -114,7 +150,15 @@ public class AgentEngine {
 
         // ----- Calculation -----
         addRule(new Rule(
-            new String[]{"calculation", "calculate", "hisab", "calc kaise", "calculation kaise", "kaise calculate", "measurement"},
+            new String[]{"calculation", "calculate", "calc", "hisab", "hisaab",
+                         "hisab kaise", "hisaab kaise", "calc kaise", "calculation kaise",
+                         "calculation kaise kare", "calculation kaise karte", "kaise calculate",
+                         "kaise calculate kare", "kaise count", "kaise gin", "kaise nikale",
+                         "kaise nikal", "measurement", "measure", "measurements",
+                         "kaam kaise kare", "kaise use kare", "how to calculate",
+                         "how to use", "kaise banate", "kaise banta", "section kaise",
+                         "size kaise", "section calculate", "window calculate",
+                         "window kaise", "kaise nikalein", "kaise karte"},
             (input) -> "Calculation karne ke liye:\n\n" +
                 "1. **Height & Width** enter karein (inch ya mm mein)\n" +
                 "2. **Quantity** set karein\n" +
@@ -130,7 +174,10 @@ public class AgentEngine {
 
         // ----- Sutter -----
         addRule(new Rule(
-            new String[]{"sutter", "shutter", "sutter kya", "sutter calculation", "shutter size"},
+            new String[]{"sutter", "sutar", "shutter", "shuter", "sutter kya",
+                         "sutter kya hai", "sutter kya hota", "sutter calculation",
+                         "sutter size", "shutter size", "sutter ka size", "sutter formula",
+                         "sutter kaise", "sutter kitna", "shutter kya", "sliding panel"},
             (input) -> "**Sutter** matlab window ka shutter (sliding panel).\n\n" +
                 "Sutter size calculate karne ke liye:\n" +
                 "\u2022 Frame ki inner width li jaati hai\n" +
@@ -144,7 +191,11 @@ public class AgentEngine {
 
         // ----- Muliya -----
         addRule(new Rule(
-            new String[]{"muliya", "muliya kya", "interlock", "muliya calculation"},
+            new String[]{"muliya", "muliya kya", "muliya kya hai", "muliya kya hota",
+                         "muliya kitne", "muliya kitna", "muliya calculation",
+                         "muliya formula", "muliya ka size", "muliya size",
+                         "muliya kaise", "mulia", "interlock",
+                         "interlocking", "t muliya", "long muliya", "short muliya"},
             (input) -> "**Muliya** (Interlock) — yeh sutter ko frame se lock karta hai.\n\n" +
                 "Types:\n" +
                 "\u2022 **Short Muliya** — small windows\n" +
@@ -159,7 +210,13 @@ public class AgentEngine {
 
         // ----- Pipe cutting -----
         addRule(new Rule(
-            new String[]{"pipe cutting", "pipe cut", "cutting plan", "cutting details", "pipe kaise kate"},
+            new String[]{"pipe cutting", "pipe cut", "pipe kat", "pipe kaise",
+                         "pipe kaise kate", "pipe kaise katen", "pipe kitna",
+                         "cutting plan", "cutting details", "cutting", "cut plan",
+                         "kaise kate", "kaise katenge", "kaise kaaten", "kaise cutting",
+                         "pipe detail", "pipe plan", "kitne pipe", "kitne pipe chahiye",
+                         "pipe optimize", "stock length", "bin packing", "pipes",
+                         "rod", "rod cutting", "patta cutting", "patta"},
             (input) -> "**Pipe Cutting Plan** automatically banta hai!\n\n" +
                 "App bin-packing algorithm use karta hai:\n" +
                 "\u2022 ZED pipes (usually 21ft/252\")\n" +
@@ -176,7 +233,14 @@ public class AgentEngine {
 
         // ----- Price -----
         addRule(new Rule(
-            new String[]{"price", "daam", "rate", "ke rate", "price kaise", "price setup", "cost"},
+            new String[]{"price", "prices", "daam", "daam kya", "rate", "rates",
+                         "ke rate", "rate kya", "rate kitna", "kitna rate",
+                         "price kaise", "price setup", "price set", "price kaise set",
+                         "price kaise set kare", "price kaise daale", "price kaise dale",
+                         "cost", "costing", "paisa", "paise", "mehnga", "sasta",
+                         "price book", "rate book", "price list", "rate list",
+                         "kitna kharcha", "kitna paisa", "labour charge", "profit margin",
+                         "mrp", "quotation", "quote"},
             (input) -> "**Price System** setup karne ke liye:\n\n" +
                 "1. Top bar mein \u20B9 (Rupee) button dabao\n" +
                 "2. Section-wise rate enter karo:\n" +
@@ -192,7 +256,13 @@ public class AgentEngine {
 
         // ----- Customer -----
         addRule(new Rule(
-            new String[]{"customer", "customer record", "save customer", "customer kaise", "customer data"},
+            new String[]{"customer", "customer record", "save customer", "customer kaise",
+                         "customer kaise save", "customer data", "customer save",
+                         "customer add", "customer list", "customer view", "customer dekh",
+                         "customer dekho", "customer detail", "customer details",
+                         "grahak", "grahak kaise", "grahak save", "grahak jodo",
+                         "client", "clients", "customer delete", "customer edit",
+                         "customer load", "customer share", "pin enter", "pin se customer"},
             (input) -> "**Customer Records** manage karne ke liye:\n\n" +
                 "\uD83D\uDCBE **Save:**\n" +
                 "Menu \u2192 Save to Customer\n" +
@@ -209,12 +279,21 @@ public class AgentEngine {
 
         // ----- User Profile -----
         addRule(new Rule(
-            new String[]{"my profile", "user profile", "mera profile", "profile kya", "owner profile", "apna profile", "profile update"},
+            new String[]{"my profile", "user profile", "mera profile", "meri profile",
+                         "profile kya", "profile kya hai", "owner profile", "apna profile",
+                         "apni profile", "profile update", "profile kaise", "profile set",
+                         "profile edit", "meri detail", "meri details", "my details",
+                         "meri jankari", "shop profile", "company profile", "owner detail"},
             (input) -> getProfileResponse()
         ));
         // ----- Backup -----
         addRule(new Rule(
-            new String[]{"backup", "backup kaise", "data save", "data backup", "data kahan"},
+            new String[]{"backup", "backup kaise", "backup kaise le", "backup kaise kare",
+                         "data backup", "data save", "data kahan", "data restore",
+                         "restore", "restore kaise", "data wapas", "data recover",
+                         "data transfer", "phone change", "naya phone", "new phone",
+                         "data loss", "data chala gaya", "data kaise bachaye",
+                         "data kaise save", "data export file", "json backup"},
             (input) -> "**Data Backup** karne ke liye:\n\n" +
                 "Menu \u2192 \"Backup data\"\n\n" +
                 "Saara data ek JSON file mein save hoga:\n" +
@@ -229,7 +308,11 @@ public class AgentEngine {
 
         // ----- Export -----
         addRule(new Rule(
-            new String[]{"export", "excel", "xlsx", "export kaise", "excel export"},
+            new String[]{"export", "export kaise", "export kaise kare", "excel",
+                         "excel export", "excel file", "xlsx", "spreadsheet",
+                         "share", "share kaise", "whatsapp", "whatsapp par",
+                         "print", "print kaise", "pdf", "pdf kaise", "share cutting",
+                         "share image", "share json", "send", "bhejo", "bhejna"},
             (input) -> "**Excel Export** karne ke liye:\n\n" +
                 "Menu \u2192 \"Share cutting images\"\n\n" +
                 "Ya customer detail mein \"Share\" button dabao\n\n" +
@@ -242,7 +325,12 @@ public class AgentEngine {
 
         // ----- Settings -----
         addRule(new Rule(
-            new String[]{"settings", "setting", "configuration", "setup", "settings kya", "settings kaise"},
+            new String[]{"settings", "setting", "configuration", "configure",
+                         "setup", "set up", "settings kya", "settings kya hai",
+                         "settings kaise", "settings kaise khole", "settings kaise open",
+                         "gear", "gear icon", "change unit", "unit change",
+                         "overlap change", "stock length change", "pin change",
+                         "pin set", "pin set kaise", "change pin"},
             (input) -> "**Settings** mein aap configure kar sakte ho:\n\n" +
                 "\u2022 **Unit** — Inch ya Millimeter\n" +
                 "\u2022 **Stock length** — Pipe ki default length\n" +
@@ -255,7 +343,11 @@ public class AgentEngine {
 
         // ----- Manual PCO -----
         addRule(new Rule(
-            new String[]{"manual pco", "pco", "manual cutting", "sheet cutting", "manual", "manual kaise"},
+            new String[]{"manual pco", "pco", "pco kya", "pco kya hai", "manual cutting",
+                         "sheet cutting", "sheet cut", "manual cut", "manual",
+                         "manual kaise", "manual mode", "custom cutting", "custom cut",
+                         "custom pipe", "sheet kaise", "sheet kaise kate",
+                         "manual sheet", "pco kaise"},
             (input) -> "**Manual PCO & Sheet Cutting** — custom cutting mode!\n\n" +
                 "Jab aapko:\n" +
                 "\u2022 Custom pipe lengths chahiye\n" +
@@ -267,7 +359,10 @@ public class AgentEngine {
 
         // ----- Thanks -----
         addRule(new Rule(
-            new String[]{"thanks", "thank you", "shukriya", "dhanyavad", "thank"},
+            new String[]{"thanks", "thank", "thankyou", "thank you", "thx",
+                         "shukriya", "sukriya", "dhanyavad", "dhanyawad",
+                         "meherbani", "bahut bahut dhanyavad", "thanks bhai",
+                         "thanks yaar", "thank u", "thank you so much"},
             (input) -> pickRandom(new String[]{
                 "Aapka swagat hai! \uD83D\uDE0A Aur koi sawaal ho toh poochhiye.",
                 "Koi baat nahi! Kabhi bhi help chahiye toh yahan hoon. \uD83D\uDE4F",
@@ -277,7 +372,10 @@ public class AgentEngine {
 
         // ----- Goodbye -----
         addRule(new Rule(
-            new String[]{"bye", "goodbye", "alvida", "tata", "bye bye", "chalta hoon"},
+            new String[]{"bye", "goodbye", "good bye", "alvida", "alvida",
+                         "tata", "bye bye", "byebye", "chalta hoon", "chaliye",
+                         "good night", "see you", "see u", "phir milte",
+                         "ab chalta hoon", "band karo", "exit", "close app"},
             (input) -> pickRandom(new String[]{
                 "Alvida! \uD83D\uDE4F Jab bhi zaroorat ho, yahan hoon.",
                 "Bye bye! Kaam mein shubhkamnayein! \uD83D\uDE0A",
@@ -287,7 +385,12 @@ public class AgentEngine {
 
         // ----- Who are you -----
         addRule(new Rule(
-            new String[]{"who are you", "tum kaun", "kaun ho", "your name", "tera naam", "apna naam"},
+            new String[]{"who are you", "who r u", "tum kaun", "tum kon", "tu kaun",
+                         "kaun ho", "kaun ho tum", "aap kaun", "aap kon",
+                         "your name", "tumhara naam", "tumhara kya naam",
+                         "tera naam", "apna naam", "apna naam batao",
+                         "naam kya hai", "tumhara naam kya", "assistant kaun",
+                         "robot", "bot", "chatbot", "ai kon", "ai kaun"},
             (input) -> "Main **ALU Assistant** hoon! \uD83E\uDD16\n\n" +
                 "Aapka aluminium window calculation helper.\n" +
                 "App ke baare mein koi bhi sawaal poochh sakte ho.\n\n" +
@@ -296,7 +399,10 @@ public class AgentEngine {
 
         // ----- ZED -----
         addRule(new Rule(
-            new String[]{"zed", "zed kya hai", "zed system", "zed section"},
+            new String[]{"zed", "zed kya", "zed kya hai", "zed kya hota",
+                         "zed system", "zed section", "zed sections", "zed single",
+                         "zed double", "zed track", "zed pipe", "zed size",
+                         "single track", "double track"},
             (input) -> "**ZED** — Single/Double track aluminium window system.\n\n" +
                 "Types:\n" +
                 "\u2022 **ZED Single Track** — Basic sliding window\n" +
@@ -311,7 +417,10 @@ public class AgentEngine {
 
         // ----- DOMAL -----
         addRule(new Rule(
-            new String[]{"domal", "domal kya", "domal system", "domal section"},
+            new String[]{"domal", "domal kya", "domal kya hai", "domal kya hota",
+                         "domal system", "domal section", "domal sections",
+                         "domal pipe", "domal size", "domal vs zed",
+                         "premium system", "premium window"},
             (input) -> "**DOMAL** — Premium double track aluminium system.\n\n" +
                 "Features:\n" +
                 "\u2022 Stronger frame\n" +
@@ -327,7 +436,15 @@ public class AgentEngine {
 
         // ----- Help -----
         addRule(new Rule(
-            new String[]{"help", "madad", "help karo", "madad karo", "kya kar sakte ho", "help me"},
+            new String[]{"help", "hlp", "madad", "sahayata", "sahayak",
+                         "help karo", "madad karo", "maddad karo", "help chahiye",
+                         "madad chahiye", "kya kar sakte ho", "kya kar sakte",
+                         "kya kya kar sakte", "what can you do", "help me",
+                         "kya poocho", "kya poochoon", "kya puchu", "kya batayega",
+                         "kya bataoge", "kya jaante ho", "kya jante ho", "guide",
+                         "tutorial", "sikhao", "sikhao kaise", "kaise sikho",
+                         "kaise shuru kare", "kaise start kare", "options",
+                         "kya options", "menu", "kya karoon", "kya karu"},
             (input) -> "Main aapki in cheezon mein help kar sakta hoon:\n\n" +
                 "\uD83D\uDD27 **App Guide**\n" +
                 "\u2022 \"app kya hai\" — App ke features\n" +
@@ -347,7 +464,12 @@ public class AgentEngine {
 
         // ----- Units -----
         addRule(new Rule(
-            new String[]{"unit", "inch", "mm", "millimeter", "inch vs mm", "unit kya"},
+            new String[]{"unit", "units", "inch", "inches", "mm", "millimeter",
+                         "millimeters", "millimetre", "centimeter", "cm",
+                         "feet", "foot", "ft", "inch vs mm", "unit kya",
+                         "unit kaise", "unit kaise change", "kaunse unit",
+                         "konse unit", "which unit", "mm mein", "inch mein",
+                         "mm ya inch", "inch ya mm", "metric", "unit select"},
             (input) -> "**Units** — App mein do units hain:\n\n" +
                 "\u2022 **Inch (in)** — Common measurement\n" +
                 "\u2022 **Millimeter (mm)** — Metric measurement\n\n" +
@@ -358,7 +480,11 @@ public class AgentEngine {
 
         // ----- Waste -----
         addRule(new Rule(
-            new String[]{"waste", "waste kya", "kitna waste", "waste percentage", "scrap"},
+            new String[]{"waste", "west", "waste kya", "waste kya hai",
+                         "kitna waste", "waste kitna", "waste percentage",
+                         "waste percent", "scrap", "bachat", "bacha hua",
+                         "remaining pipe", "cut waste", "optimize", "optimization",
+                         "minimum waste", "kam waste", "fayda", "loss"},
             (input) -> "**Waste** — Bachi hui pipe jo use nahi hoti.\n\n" +
                 "App **bin-packing algorithm** use karta hai:\n" +
                 "\u2022 Minimum waste nikalta hai\n" +
@@ -372,7 +498,11 @@ public class AgentEngine {
 
         // ----- Formula -----
         addRule(new Rule(
-            new String[]{"formula", "custom formula", "apna formula", "formula kaise", "formula kya"},
+            new String[]{"formula", "formulae", "custom formula", "apna formula",
+                         "formula kaise", "formula kaise banaye", "formula kya",
+                         "formula kya hai", "custom rule", "custom rules",
+                         "overlap formula", "muliya formula", "clearance",
+                         "apna hisaab", "custom calculation", "formula editor"},
             (input) -> "**Custom Formulas** — Apne hisaab se calculations!\n\n" +
                 "Menu \u2192 \"Formula\"\n\n" +
                 "Aap bana sakte ho:\n" +
@@ -382,6 +512,38 @@ public class AgentEngine {
                 "\u2022 Apne section dimensions\n\n" +
                 "Har system (ZED/DOMAL) ke alag formulas rakh sakte ho.\n\n" +
                 "Custom formulas aapke business ke unique requirements ke liye hain!"
+        ));
+
+        // ----- RP / Glass bead -----
+        addRule(new Rule(
+            new String[]{"rp", "r p", "glass bead", "glassbead", "bead",
+                         "rp kya", "rp kya hai", "rp kitna", "rp kitne",
+                         "rp formula", "rp size", "rp spacing", "rp gap",
+                         "grill", "glass fitting", "glass fitting",
+                         "glass kaise", "glass size", "retainer", "glass patti"},
+            (input) -> "**RP (Glass Bead / Retainer)** — glass ko frame mein pakadne wali patti.\\n\\n" +
+                "RP ki quantity window ke height pe depend karti hai. Settings mein:\\n" +
+                "\\u2022 **rpGap** — har RP ke beech ka gap\\n" +
+                "\\u2022 **rpMin / rpMax** — allowed spacing range\\n\\n" +
+                "App automatically valid spacing ke hisaab se RP count suggest karta hai.\\n" +
+                "RP Sutter ke andar fit hota hai aur glass ko hold karta hai! \\uD83E\\uDE9F"
+        ));
+
+        // ----- Frame / Section / Track (general parts) -----
+        addRule(new Rule(
+            new String[]{"frame", "section", "sections", "track", "tracks",
+                         "frame kya", "section kya", "section kya hai",
+                         "outer frame", "frame size", "frame kitna",
+                         "aluminium section", "part", "parts", "parts name",
+                         "konse part", "which parts", "components", "window parts",
+                         "window ke part", "window parts name"},
+            (input) -> "Window ke **4 main sections** hote hain:\\n\\n" +
+                "\\uD83D\\uDD32 **Frame** — Outer structure, window ka boundary\\n" +
+                "\\uD83D\\uDEAA **Sutter (Shutter)** — Sliding panel jo khulta/band hota hai\\n" +
+                "\\uD83D\\uDD12 **Muliya (Interlock)** — Sutter ko frame se lock karta hai\\n" +
+                "\\uD83E\\uDE9F **RP (Glass Bead)** — Glass ko frame mein pakadta hai\\n\\n" +
+                "ZED aur DOMAL systems ke sections alag-alag size ke hote hain.\\n" +
+                "Har section ki length Height/Width aur quantity se calculate hoti hai!"
         ));
     }
 
@@ -400,11 +562,52 @@ public class AgentEngine {
             this.generator = generator;
         }
 
-        boolean matches(String input) {
+        /**
+         * Score a (already normalized) input against this rule.
+         * - Phrases (keywords with spaces) must appear as a contiguous phrase;
+         *   each one contributes (wordCount * 2) points.
+         * - Single words must match on word boundaries (so "mm" does not match
+         *   inside "hmm"); each contributes 1 point.
+         * Returns 0 when nothing matches.
+         */
+        int score(String input) {
+            int total = 0;
             for (String kw : keywords) {
-                if (input.contains(kw)) return true;
+                String k = kw.trim().toLowerCase(java.util.Locale.US);
+                if (k.isEmpty()) continue;
+                if (k.contains(" ")) {
+                    if (containsPhrase(input, k)) {
+                        total += 2 * k.split(" ").length;
+                    }
+                } else if (containsWord(input, k)) {
+                    total += 1;
+                }
             }
-            return false;
+            return total;
+        }
+
+        /** True if the normalized input contains {@code word} as a whole word. */
+        private static boolean containsWord(String input, String word) {
+            int from = 0;
+            while (true) {
+                int i = input.indexOf(word, from);
+                if (i < 0) return false;
+                boolean leftOk = (i == 0) || input.charAt(i - 1) == ' ';
+                int after = i + word.length();
+                boolean rightOk = (after == input.length()) || input.charAt(after) == ' ';
+                if (leftOk && rightOk) return true;
+                from = i + 1;
+            }
+        }
+
+        /** True if the normalized input contains the multi-word phrase. */
+        private static boolean containsPhrase(String input, String phrase) {
+            int i = input.indexOf(phrase);
+            if (i < 0) return false;
+            int after = i + phrase.length();
+            boolean leftOk = (i == 0) || input.charAt(i - 1) == ' ';
+            boolean rightOk = (after == input.length()) || input.charAt(after) == ' ';
+            return leftOk && rightOk;
         }
 
         String respond(String input) {
