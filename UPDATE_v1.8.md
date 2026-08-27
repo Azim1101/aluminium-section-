@@ -9,24 +9,21 @@
 - Used by AI Agent for personalized responses
 - Included in backup/restore
 
-### 2. 🤖 AI Agent (Chat & ONNX Neural Model)
-- **Local ONNX AI model** (`agent_model.onnx`, ~268 KB) running via ONNX Runtime Android
-- **Ultra-fast on-device inference** (<1ms latency), zero cloud dependency, 100% offline
-- **Hinglish & English support** (natural mixed queries, misspellings, colloquial phrasing)
-- **Knowledge base** includes:
-  - App features & navigation
-  - Aluminium calculations (Sutter, Muliya, RP)
-  - Window types (ZED, DOMAL)
-  - Pipe cutting & bin-packing algorithm
-  - Price setup
-  - Customer management
-  - Backup/restore
-  - Settings & formulas
-- **Hybrid intelligence**: ONNX neural intent classification + rule-matching pattern engine
-- **Quick action chips** for common queries
-- **Typing indicator** for natural conversation feel
-- **Personalized greetings** using user profile name
-- Accessible from Menu → "AI Agent (Chat)"
+### 2. 🤖 AI Agent (Chat, Fixed UI & Qwen 0.5B Support)
+- **Fixed Chatbot UI**:
+  - Full-width modern responsive message bubbles (fixed narrow letter-by-letter vertical squishing)
+  - Clean markdown bold formatting without word-break glitches
+  - User and assistant avatars (`👤` and `🤖`)
+  - Horizontally scrollable quick action chips with icons
+- **Qwen 2.5 0.5B LLM Support (Under 500MB)**:
+  - Supports Qwen 2.5 0.5B Instruct INT4 (~350MB, well under 500MB)
+  - In-app background downloader with live percentage and MB progress
+  - Local model importer (`.onnx` / `.bin` / `.gguf`)
+  - Model manager dialog accessible from top bar `[⚙️ Model]`
+- **Lightweight Built-in ONNX Classifier (~268 KB)**:
+  - Instant on-device classification (<1ms latency)
+  - 100% offline, zero internet needed
+  - Active immediately even before Qwen is downloaded
 
 ## 📁 New Files
 

@@ -24,7 +24,7 @@ and exports estimates via WhatsApp or Excel.
 - **WhatsApp sharing** for quick estimates
 - **Unit toggle** — inches ↔ millimeters
 - **Configurable business header/footer** for estimates (set in Settings — name, address, mobile)
-- **AI Agent with ONNX Neural Model** — lightweight on-device AI assistant (~268 KB ONNX model) answering Hinglish & English fabrication questions 100% offline via ONNX Runtime
+- **AI Agent with Qwen 0.5B & ONNX Neural Models** — on-device AI assistant with fixed responsive chat UI, supporting Qwen 2.5 0.5B (~350MB INT4, under 500MB) with in-app downloader/importer + built-in lightweight ONNX classifier (~268 KB, 100% offline)
 
 ---
 

@@ -124,4 +124,11 @@ public class AgentEngineTest {
             assertTrue(Math.abs(Math.sqrt(sumSq) - 1.0) < 1e-4);
         }
     }
+
+    @Test
+    public void qwenIntegrationHandlesUninstalledStateGracefully() {
+        AgentEngine engine = new AgentEngine(null);
+        assertFalse(engine.isQwenActive());
+        assertNotNull(engine.getGreeting());
+    }
 }

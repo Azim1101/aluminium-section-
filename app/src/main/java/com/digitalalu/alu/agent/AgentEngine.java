@@ -6,10 +6,11 @@ import android.content.Context;
 import java.util.*;
 
 /**
- * AI agent engine with hybrid intelligence:
- * 1. Offline lightweight ONNX Runtime Neural Classifier (~268 KB)
- * 2. Keyword & rule-matching pattern engine
- * 3. Contextual fallback
+ * AI agent engine with hybrid multi-tier intelligence:
+ * Tier 1: On-device Qwen 2.5 0.5B LLM (under 500MB, when installed)
+ * Tier 2: Built-in on-device ONNX Runtime Neural Classifier (~268 KB)
+ * Tier 3: Keyword & rule-matching pattern engine
+ * Tier 4: Contextual fallback
  *
  * Supports Hinglish (Hindi + English mixed) completely offline.
  */
@@ -21,6 +22,8 @@ public class AgentEngine {
     private final Context context;
     private final List<Rule> rules = new ArrayList<>();
     private OnnxAgentClassifier onnxClassifier;
+    private QwenModelManager qwenModelManager;
+    private QwenAgentEngine qwenEngine;
     private OnnxAgentClassifier.Prediction lastPrediction;
 
     public AgentEngine(Context context) {
@@ -30,7 +33,31 @@ public class AgentEngine {
         } catch (Throwable ignored) {
             this.onnxClassifier = null;
         }
+
+        try {
+            if (context != null) {
+                this.qwenModelManager = new QwenModelManager(context);
+                this.qwenEngine = new QwenAgentEngine(context, qwenModelManager);
+            }
+        } catch (Throwable ignored) {
+            this.qwenModelManager = null;
+            this.qwenEngine = null;
+        }
+
         buildKnowledgeBase();
+    }
+
+    /** Returns whether on-device Qwen 0.5B LLM is active */
+    public boolean isQwenActive() {
+        return qwenEngine != null && qwenEngine.isReady();
+    }
+
+    public QwenModelManager getQwenModelManager() {
+        return qwenModelManager;
+    }
+
+    public QwenAgentEngine getQwenEngine() {
+        return qwenEngine;
     }
 
     /** Returns whether the on-device ONNX model is initialized and ready */
@@ -53,7 +80,17 @@ public class AgentEngine {
             return pickRandom(greetings());
         }
 
-        // 1. Primary: ONNX Neural Network Model Inference
+        // 1. Tier 1: Qwen 0.5B Generative LLM (if installed)
+        if (isQwenActive()) {
+            try {
+                String qwenResp = qwenEngine.generate(userInput);
+                if (qwenResp != null && !qwenResp.trim().isEmpty()) {
+                    return qwenResp;
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        // 2. Tier 2: ONNX Neural Network Model Inference
         if (onnxClassifier != null && onnxClassifier.isReady()) {
             try {
                 OnnxAgentClassifier.Prediction pred = onnxClassifier.predict(userInput);
@@ -69,14 +106,14 @@ public class AgentEngine {
             } catch (Throwable ignored) {}
         }
 
-        // 2. Secondary: Rule-matching pattern engine
+        // 3. Tier 3: Rule-matching pattern engine
         for (Rule rule : rules) {
             if (rule.matches(input)) {
                 return rule.respond(input);
             }
         }
 
-        // 3. Tertiary: Moderate-confidence ONNX prediction fallback
+        // 4. Tier 4: Moderate-confidence ONNX prediction fallback
         if (lastPrediction != null && lastPrediction.confidence >= ONNX_FALLBACK_THRESHOLD) {
             String resp = getResponseForIntent(lastPrediction.intent, input);
             if (resp != null && !resp.isEmpty()) {
@@ -84,7 +121,7 @@ public class AgentEngine {
             }
         }
 
-        // 4. Default fallback
+        // 5. Default fallback
         return fallback(input);
     }
 
@@ -92,8 +129,9 @@ public class AgentEngine {
     public String getGreeting() {
         UserProfile profile = context != null ? UserProfile.load(context) : new UserProfile();
         String name = profile.name.isEmpty() ? "" : " " + profile.name;
+        String modelName = isQwenActive() ? "Qwen 0.5B AI \uD83E\uDD16" : "ONNX AI \uD83E\uDD16";
         return "Namaste" + name + "!\uD83D\uDE4F\n\n" +
-               "Main aapka ALU Assistant hoon (Powered by ONNX AI \uD83E\uDD16).\n\n" +
+               "Main aapka ALU Assistant hoon (Powered by " + modelName + ").\n\n" +
                "Aap mujhse yeh sab poochh sakte ho:\n\n" +
                "\u2022 App ke baare mein\n" +
                "\u2022 Aluminium calculations & naap\n" +
@@ -119,7 +157,7 @@ public class AgentEngine {
 
             case "WHO_ARE_YOU":
                 return "Main **ALU Assistant** hoon! \uD83E\uDD16\n\n" +
-                    "Aapka on-device AI aluminium window calculation helper (ONNX Powered).\n" +
+                    "Aapka on-device AI aluminium window calculation helper (" + (isQwenActive() ? "Qwen 0.5B" : "ONNX Powered") + ").\n" +
                     "App ke baare mein koi bhi sawaal poochh sakte ho.\n\n" +
                     "Main 100% offline kaam karta hoon — internet ki zaroorat nahi! \u2708";
 
@@ -577,6 +615,10 @@ public class AgentEngine {
         if (onnxClassifier != null) {
             onnxClassifier.close();
             onnxClassifier = null;
+        }
+        if (qwenEngine != null) {
+            qwenEngine.close();
+            qwenEngine = null;
         }
     }
 }
