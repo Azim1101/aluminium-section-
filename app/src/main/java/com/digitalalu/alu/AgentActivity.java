@@ -59,7 +59,7 @@ public class AgentActivity extends AppCompatActivity {
         top.addView(title);
 
         TextView status = new TextView(this);
-        status.setText("Online \u2022 Offline AI");
+        status.setText(engine.isOnnxReady() ? "Online \u2022 \uD83E\uDD16 ONNX AI" : "Online \u2022 Offline AI");
         status.setTextColor(0xFFCFE0FF);
         status.setTextSize(10);
         top.addView(status);
@@ -304,6 +304,14 @@ public class AgentActivity extends AppCompatActivity {
 
     private void scrollToBottom() {
         scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (engine != null) {
+            engine.close();
+        }
     }
 
     private int dp(int v) { return (int) (v * getResources().getDisplayMetrics().density); }

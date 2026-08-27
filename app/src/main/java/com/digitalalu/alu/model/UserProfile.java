@@ -44,6 +44,7 @@ public class UserProfile {
     
     public static UserProfile load(Context ctx) {
         try {
+            if (ctx == null) return new UserProfile();
             SharedPreferences sp = ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
             String s = sp.getString("profile", null);
             if (s == null) return new UserProfile();

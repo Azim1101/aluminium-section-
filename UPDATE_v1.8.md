@@ -9,9 +9,10 @@
 - Used by AI Agent for personalized responses
 - Included in backup/restore
 
-### 2. 🤖 AI Agent (Chat)
-- **Local AI chatbot** — no internet required
-- **Hinglish support** (Hindi + English mixed)
+### 2. 🤖 AI Agent (Chat & ONNX Neural Model)
+- **Local ONNX AI model** (`agent_model.onnx`, ~268 KB) running via ONNX Runtime Android
+- **Ultra-fast on-device inference** (<1ms latency), zero cloud dependency, 100% offline
+- **Hinglish & English support** (natural mixed queries, misspellings, colloquial phrasing)
 - **Knowledge base** includes:
   - App features & navigation
   - Aluminium calculations (Sutter, Muliya, RP)
@@ -21,7 +22,7 @@
   - Customer management
   - Backup/restore
   - Settings & formulas
-- **Smart pattern matching** with keyword detection
+- **Hybrid intelligence**: ONNX neural intent classification + rule-matching pattern engine
 - **Quick action chips** for common queries
 - **Typing indicator** for natural conversation feel
 - **Personalized greetings** using user profile name

@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - Main/aluminium-section
-      - arena/019fcd63-aluminium-section
+      - 'arena/**'
     tags:
       - 'v*'
   workflow_dispatch:
