@@ -16,4 +16,17 @@
     <color name="cMuliya">#8B5CF6</color>
     <color name="cRp">#EC4899</color>
     <color name="waste">#D8DFE9</color>
+
+    <!-- WhatsApp Chat Theme Colors -->
+    <color name="wa_teal">#008069</color>
+    <color name="wa_teal_dark">#075E54</color>
+    <color name="wa_green">#00A884</color>
+    <color name="wa_light_green">#E7FFDB</color>
+    <color name="wa_bg">#EFEAE2</color>
+    <color name="wa_bg_pattern">#E5DDD5</color>
+    <color name="wa_bubble_user">#E7FFDB</color>
+    <color name="wa_bubble_agent">#FFFFFF</color>
+    <color name="wa_tick_blue">#53BDEB</color>
+    <color name="wa_text_dark">#111B21</color>
+    <color name="wa_text_muted">#667781</color>
 </resources>

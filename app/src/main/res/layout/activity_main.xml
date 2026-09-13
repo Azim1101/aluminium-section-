@@ -63,6 +63,15 @@
             app:tint="#FFFFFF"/>
 
         <ImageButton
+            android:id="@+id/btnAiAgent"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_ai_agent"
+            android:contentDescription="AI Agent"
+            app:tint="#FFFFFF"/>
+
+        <ImageButton
             android:id="@+id/btnSettings"
             android:layout_width="42dp"
             android:layout_height="42dp"

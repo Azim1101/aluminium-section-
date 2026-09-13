@@ -1,0 +1,6 @@
+{
+  "name": "ALU Window",
+  "description": "Aluminium window cutting and section cost calculation app",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

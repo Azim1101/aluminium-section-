@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btnProfile).setOnClickListener(v ->
                 startActivityForResult(new Intent(this, CustomerActivity.class), REQ_CUSTOMER));
+        findViewById(R.id.btnAiAgent).setOnClickListener(v ->
+                startActivity(new Intent(this, AgentActivity.class)));
         findViewById(R.id.btnMore).setOnClickListener(this::showMenu);
 
         recalc();
@@ -130,8 +132,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        items.clear();
+        loadData();
+        if (items.isEmpty()) addWindow(0, 0, 2, 1);
         pb = PriceBook.load(this);
-        if (showPrice) recalc();
+        recalc();
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 
     @Override
