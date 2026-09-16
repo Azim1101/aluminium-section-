@@ -22,6 +22,7 @@ import com.digitalalu.alu.calc.Costing;
 import com.digitalalu.alu.calc.Engine;
 import com.digitalalu.alu.calc.PriceBook;
 import com.digitalalu.alu.model.WindowItem;
+import com.digitalalu.alu.util.TextFields;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,7 +215,8 @@ public class PriceActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence c, int i, int j, int k) {}
             public void onTextChanged(CharSequence c, int i, int j, int k) {}
             public void afterTextChanged(Editable s) {
-                try { cb.set(Double.parseDouble(s.toString().trim())); } catch (Exception ignored) {}
+                double v = TextFields.parse(s.toString(), Double.NaN);
+                if (!Double.isNaN(v)) cb.set(v);
             }
         });
         l.addView(e);
@@ -246,10 +248,10 @@ public class PriceActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence c, int i, int j, int k) {}
             public void onTextChanged(CharSequence c, int i, int j, int k) {}
             public void afterTextChanged(Editable s) {
-                try {
-                    pb.kg.put(type, Double.parseDouble(s.toString().trim()));
-                    pb.save(PriceActivity.this);
-                } catch (Exception ignored) {}
+                double v = TextFields.parse(s.toString(), Double.NaN);
+                if (Double.isNaN(v)) return;
+                pb.kg.put(type, v);
+                pb.save(PriceActivity.this);
             }
         });
         l.addView(e);
@@ -305,9 +307,7 @@ public class PriceActivity extends AppCompatActivity {
                 .setPositiveButton("Add", (d, w) -> {
                     String name = nm.getText().toString().trim();
                     if (name.isEmpty()) name = "Extra";
-                    double rate = 0;
-                    try { rate = Double.parseDouble(rt.getText().toString().trim()); }
-                    catch (Exception ignored) {}
+                    double rate = TextFields.parse(rt.getText().toString(), 0);
                     int sysV = ss.getSelectedItemPosition() == 0 ? -1
                             : (ss.getSelectedItemPosition() == 1 ? WindowItem.ZED : WindowItem.DOMAL);
                     pb.extras.add(new PriceBook.Extra(name,
@@ -348,6 +348,7 @@ public class PriceActivity extends AppCompatActivity {
     private EditText mkInput(double val) {
         EditText e = new EditText(this);
         e.setText(trim(val));
+        TextFields.caretToEnd(e);   // setText() parks the caret at index 0
         e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
                 | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         e.setBackgroundResource(R.drawable.bg_input);

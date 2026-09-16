@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - Main/aluminium-section
-      - arena/019fcd63-aluminium-section
+      - 'arena/**'          # every Arena session branch builds an APK
     tags:
       - 'v*'
   workflow_dispatch:

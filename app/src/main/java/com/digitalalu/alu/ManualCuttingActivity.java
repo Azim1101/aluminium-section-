@@ -27,6 +27,7 @@ import com.digitalalu.alu.calc.ManualCuttingEngine;
 import com.digitalalu.alu.calc.Settings;
 import com.digitalalu.alu.ui.PipeBarView;
 import com.digitalalu.alu.ui.SheetLayoutView;
+import com.digitalalu.alu.util.TextFields;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -815,6 +816,10 @@ public class ManualCuttingActivity extends AppCompatActivity {
     private EditText numberInput(String value) {
         EditText field = new EditText(this);
         field.setText(value);
+        /* setText() leaves the caret at index 0: while EDITING a cut the dialog
+           focuses this field first, so the first digit typed landed in front of the
+           old value. Start at the end instead. */
+        TextFields.caretToEnd(field);
         field.setSelectAllOnFocus(false);
         field.setSingleLine(true);
         field.setTextSize(14f);
@@ -836,6 +841,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
     private EditText textInput(String value) {
         EditText field = new EditText(this);
         field.setText(value == null ? "" : value);
+        TextFields.caretToEnd(field);
         field.setSingleLine(true);
         field.setTextSize(14f);
         field.setTextColor(0xFF152236);
@@ -991,16 +997,12 @@ public class ManualCuttingActivity extends AppCompatActivity {
     }
 
     private double readDimension(EditText field) {
-        try {
-            return st.toIn(Double.parseDouble(field.getText().toString().trim()));
-        } catch (Exception e) {
-            return Double.NaN;
-        }
+        double v = TextFields.parse(field.getText().toString(), Double.NaN);
+        return Double.isNaN(v) ? Double.NaN : st.toIn(v);
     }
 
     private int readQuantity(EditText field) {
-        try { return Integer.parseInt(field.getText().toString().trim()); }
-        catch (Exception e) { return 0; }
+        return (int) TextFields.parse(field.getText().toString(), 0);
     }
 
     private String dim(double inches) { return st.fmt(inches); }

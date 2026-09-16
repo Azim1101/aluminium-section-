@@ -17,6 +17,7 @@ import com.digitalalu.alu.calc.Engine;
 import com.digitalalu.alu.calc.Settings;
 import com.digitalalu.alu.calc.CustomFormulaManager;
 import com.digitalalu.alu.model.WindowItem;
+import com.digitalalu.alu.util.TextFields;
 
 import java.util.List;
 
@@ -132,7 +133,17 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
         }
 
         private double num(String s) {
-            try { return Double.parseDouble(s.trim()); } catch (Exception e) { return 0; }
+            return TextFields.parseOrZero(s);
+        }
+
+        /**
+         * Write into a cell without moving the caret — see {@link TextFields}.
+         * A full list refresh used to rebind the row mid-keystroke, and because
+         * EditText.setText() parks the caret at index 0 the next digit was inserted
+         * in FRONT of the previous one: typing 45 produced 54.
+         */
+        private void setCellText(EditText et, String value) {
+            TextFields.setTextKeepCaret(et, value);
         }
 
         /** Dynamic cell colour + letter based on custom system names */
@@ -159,15 +170,14 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
         private void checkAutoAddRow() {
             if (cur == null) return;
             int position = getAdapterPosition();
-            if (position == getItemCount() - 1) {
-                if (cur.h > 0 || cur.w > 0) {
-                    tvSys.post(() -> {
-                        if (position == getItemCount() - 1) {
-                            lis.onAutoAddRow();
-                        }
-                    });
-                }
-            }
+            if (position == RecyclerView.NO_POSITION) return;      // mid-layout / detached
+            if (position != getItemCount() - 1) return;            // only the last row grows the sheet
+            if (cur.h <= 0 && cur.w <= 0) return;
+            tvSys.post(() -> {
+                if (cur == null) return;
+                int p = getAdapterPosition();
+                if (p != RecyclerView.NO_POSITION && p == getItemCount() - 1) lis.onAutoAddRow();
+            });
         }
 
         /** auto RP from height */
@@ -175,8 +185,7 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             if (cur == null) return;
             Engine.WinResult r = Engine.calc(cur, st);
             binding = true;
-            if (cur.isEmpty() || r.rpAutoQty <= 0) etRp.setText("");
-            else etRp.setText(String.valueOf(r.rpAutoQty));
+            setCellText(etRp, (cur.isEmpty() || r.rpAutoQty <= 0) ? "" : String.valueOf(r.rpAutoQty));
             binding = false;
         }
 
@@ -185,14 +194,14 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             cur = items.get(pos);
             tvNo.setText(String.valueOf(pos + 1));
 
-            etH.setText(cur.h > 0 ? trim(cur.h) : "");
-            etW.setText(cur.w > 0 ? trim(cur.w) : "");
+            setCellText(etH, cur.h > 0 ? trim(cur.h) : "");
+            setCellText(etW, cur.w > 0 ? trim(cur.w) : "");
             tvSutter.setText(String.valueOf(cur.sutter));
             paintSys();
 
             Engine.WinResult r = Engine.calc(cur, st);
             int show = cur.rpQty > 0 ? cur.rpQty : r.rpAutoQty;
-            etRp.setText((cur.isEmpty() || show <= 0) ? "" : String.valueOf(show));
+            setCellText(etRp, (cur.isEmpty() || show <= 0) ? "" : String.valueOf(show));
 
             binding = false;
             mark();

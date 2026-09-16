@@ -40,6 +40,7 @@ import com.digitalalu.alu.ui.InsetsHelper;
 import com.digitalalu.alu.ui.PipeBarView;
 import com.digitalalu.alu.ui.RpRulerView;
 import com.digitalalu.alu.ui.RowAdapter;
+import com.digitalalu.alu.util.TextFields;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 
@@ -217,8 +218,22 @@ public class MainActivity extends AppCompatActivity {
     private void addWindow(double h, double w, int sutter, int nos, int sys) {
         seq++;
         items.add(new WindowItem(seq, "W" + seq, sys, h, w, sutter, nos));
-        adapter.notifyDataSetChanged();
-        rv.scrollToPosition(items.size() - 1);
+        final int pos = items.size() - 1;
+
+        /* Announce ONLY the new row.
+           notifyDataSetChanged() rebinds the row the user is typing in and
+           EditText.setText() throws the caret back to index 0, so the next digit
+           landed in front of the previous one (Height "45" turned into "54").
+           Auto add-row fires on the first keystroke, which is why every row was
+           affected. */
+        Runnable announce = () -> {
+            if (pos == items.size() - 1) adapter.notifyItemInserted(pos);
+            else adapter.notifyDataSetChanged();          // list changed underneath us
+            rv.scrollToPosition(Math.max(0, items.size() - 1));
+        };
+        if (rv.isComputingLayout()) rv.post(announce);    // never notify during a layout pass
+        else announce.run();
+
         recalc(); saveData();
     }
 
@@ -241,11 +256,16 @@ public class MainActivity extends AppCompatActivity {
         android.widget.Spinner dRp = v.findViewById(R.id.dRp);
         TextView dResult = v.findViewById(R.id.dResult);
 
-        dH.setText(trimNum(it.h));
-        dW.setText(trimNum(it.w));
+        /* a brand new row is 0 x 0 — show empty cells, not "0" that the user has
+           to delete first (otherwise typing 45 after the 0 gave "045") */
+        dH.setText(it.h > 0 ? trimNum(it.h) : "");
+        dW.setText(it.w > 0 ? trimNum(it.w) : "");
         dNos.setText(String.valueOf(it.nos));
         dName.setText(it.name);
-
+        /* setText() parks the caret at index 0 — the dialog focuses HEIGHT first, so
+           the first digit typed would land in FRONT of the existing value ("48" -> "548").
+           Always start at the end. */
+        caretToEnd(dH); caretToEnd(dW); caretToEnd(dNos); caretToEnd(dName);
         List<String> sq = new ArrayList<>();
         for (int i = 1; i <= 6; i++) sq.add(i + " Sutter");
         android.widget.ArrayAdapter<String> sa = new android.widget.ArrayAdapter<>(
@@ -306,9 +326,9 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence c, int a, int b, int d) {}
             public void onTextChanged(CharSequence c, int a, int b, int d) {}
             public void afterTextChanged(android.text.Editable e) {
-                tmp.h = pd(dH.getText().toString(), tmp.h);
-                tmp.w = pd(dW.getText().toString(), tmp.w);
-                tmp.nos = Math.max(1, (int) pd(dNos.getText().toString(), tmp.nos));
+                tmp.h = pd0(dH.getText().toString());
+                tmp.w = pd0(dW.getText().toString());
+                tmp.nos = Math.max(1, (int) pd0(dNos.getText().toString()));
                 refresh.run();
             }
         };
@@ -352,8 +372,22 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Parse a numeric cell. Empty or half typed text ("", ".") counts as 0 so the
+     * model never keeps a stale size, and "," is accepted as a decimal separator
+     * because several keyboards offer it on the numeric pad.
+     */
+    private double pd0(String s) {
+        return TextFields.parseOrZero(s);
+    }
+
     private double pd(String s, double def) {
-        try { return Double.parseDouble(s.trim()); } catch (Exception e) { return def; }
+        return TextFields.parse(s, def);
+    }
+
+    /** EditText.setText() parks the caret at index 0 — move it to the end. */
+    private void caretToEnd(EditText et) {
+        TextFields.caretToEnd(et);
     }
     private String trimNum(double d) {
         if (d == Math.floor(d)) return String.valueOf((long) d);
@@ -1044,8 +1078,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private double d(EditText e, double def) {
-        try { return Double.parseDouble(e.getText().toString().trim()); }
-        catch (Exception ex) { return def; }
+        return pd(e.getText().toString(), def);
     }
 
     /* ================= UI HELPERS ================= */

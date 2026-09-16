@@ -34,6 +34,15 @@ if (releaseTaskRequested && !releaseSigningReady) {
             + "or set ALU_KEYSTORE_FILE, ALU_KEYSTORE_PASSWORD, ALU_KEY_ALIAS and ALU_KEY_PASSWORD.")
 }
 
+/* debug.keystore is NOT in version control. Pointing storeFile at a file that does
+ * not exist makes AGP fail with
+ *   "Keystore file ... not found for signing config 'debug'"
+ * during :app:validateSigningDebug, so a fresh clone / CI runner could not build at
+ * all. Only use the repo keystore when it is really there; otherwise fall back to
+ * the AGP default (~/.android/debug.keystore), which Gradle creates on its own. */
+def debugStoreFile = rootProject.file("debug.keystore")
+def debugSigningReady = debugStoreFile.exists()
+
 android {
     namespace 'com.digitalalu.alu'
     compileSdk 35
@@ -42,17 +51,19 @@ android {
         applicationId "com.digitalalu.alu"
         minSdk 21
         targetSdk 35
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.8.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         debug {
-            storeFile file("${rootDir}/debug.keystore")
-            storePassword "android"
-            keyAlias "androiddebugkey"
-            keyPassword "android"
+            if (debugSigningReady) {
+                storeFile debugStoreFile
+                storePassword "android"
+                keyAlias "androiddebugkey"
+                keyPassword "android"
+            }
         }
         release {
             if (releaseSigningReady) {
@@ -66,7 +77,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig signingConfigs.debug
+            if (debugSigningReady) signingConfig signingConfigs.debug
         }
         release {
             minifyEnabled false

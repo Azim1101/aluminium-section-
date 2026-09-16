@@ -92,7 +92,8 @@
         android:textColorHint="#F0A9CB"
         android:hint="—"
         android:maxLines="1"
-        android:padding="1dp"/>
+        android:padding="1dp"
+        android:imeOptions="actionNext"/>
 
     <!-- delete -->
     <TextView
