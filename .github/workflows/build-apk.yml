@@ -33,9 +33,32 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699  # v4.0.1
+        with:
+          # The action defaults to 'tools platform-tools'. Google removed the legacy
+          # 'tools' package from the SDK repository, so sdkmanager exits 1 and this
+          # step dies before the build starts (seen from 2026-09-14, intermittent).
+          # cmdline-tools is installed by the action itself; these are all we need.
+          packages: 'platform-tools platforms;android-35'
 
       - name: Accept SDK licenses
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+        run: |
+          # cmdline-tools lands in a versioned folder (e.g. cmdline-tools/20.0),
+          # not always in "latest", so pick whichever sdkmanager is really there.
+          SDKMANAGER=""
+          for candidate in "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+                           "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager \
+                           "$ANDROID_HOME/tools/bin/sdkmanager"; do
+            if [ -x "$candidate" ]; then SDKMANAGER="$candidate"; break; fi
+          done
+          if [ -z "$SDKMANAGER" ] && command -v sdkmanager >/dev/null 2>&1; then
+            SDKMANAGER="sdkmanager"
+          fi
+          if [ -z "$SDKMANAGER" ]; then
+            echo "No sdkmanager found - using the licenses pre-accepted in the runner image"
+            exit 0
+          fi
+          echo "Using $SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses || true
 
       - name: Setup Gradle 8.7
         uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb  # v6.3.0
