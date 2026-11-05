@@ -1,8 +1,22 @@
-# ALU Window Optimizer (Native v2)
+# ALU Window — v1.1.0
 
 Native Android application for aluminium window/door fabricators. Calculates cut lengths,
 optimizes pipe usage (bin-packing), generates cutting plans, estimates costs,
 and exports estimates via WhatsApp or Excel.
+
+## Current source
+
+Imported from `ALU-Window-v1.1.0-source.zip`, latest Drive copy modified
+2026-11-03. See [v1.1.0 release notes](VERSION-1.1.0.md).
+
+- Build with **JDK 21, Gradle 8.11.1, Android SDK 35** (AGP 8.7.3).
+- Requires Android 7.0+ (API 24); native libraries support arm64-v8a and armeabi-v7a.
+- Signing keys are intentionally excluded. Debug uses Android's generated debug key;
+  release signing continues to use existing repository secrets / signing.properties.
+- The archive resets version numbering to 1.1.0 / versionCode 3. Older repository
+  builds used versionCode 9: Android will not install this over those builds as an
+  upgrade. A future distribution must choose a versionCode above installed builds
+  and retain their original release signing key.
 
 ---
 

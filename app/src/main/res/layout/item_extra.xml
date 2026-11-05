@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI extras row -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:minHeight="@dimen/ou_row_min"
     android:orientation="horizontal" android:baselineAligned="false"
-    android:gravity="center_vertical" android:paddingTop="4dp" android:paddingBottom="4dp">
+    android:gravity="center_vertical"
+    android:paddingTop="8dp" android:paddingBottom="8dp">
 
     <LinearLayout android:layout_width="0dp" android:layout_weight="1"
         android:layout_height="wrap_content" android:orientation="vertical">
         <TextView android:id="@+id/tvXName"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textSize="13sp" android:textStyle="bold" android:textColor="@color/txt"/>
+            android:textSize="14.5sp" android:textColor="@color/txt"/>
         <TextView android:id="@+id/tvXInfo"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:textSize="10.5sp" android:textColor="@color/mut"/>
+            android:textSize="11.5sp" android:textColor="@color/mut"
+            android:layout_marginTop="2dp"/>
     </LinearLayout>
 
     <TextView android:id="@+id/tvXRate"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:textSize="14sp" android:textStyle="bold" android:textColor="@color/ok"
-        android:layout_marginEnd="8dp"/>
+        android:textSize="15sp" android:textStyle="bold" android:textColor="@color/ok"
+        android:layout_marginEnd="10dp"/>
 
     <TextView android:id="@+id/btnXDel"
-        android:layout_width="34dp" android:layout_height="34dp"
+        android:layout_width="40dp" android:layout_height="40dp"
         android:gravity="center" android:text="✕"
+        android:background="@drawable/bg_icon_chip"
         android:textSize="15sp" android:textColor="@color/red"/>
 </LinearLayout>

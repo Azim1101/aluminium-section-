@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ALU Window</string>
+    <string name="ou_app_kicker">ALU WINDOW</string>
+    <string name="ou_add_row">+  Add row</string>
 </resources>

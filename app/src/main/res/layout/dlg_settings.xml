@@ -1,145 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI settings.
+  Har group ka apna section accent token hai (secBiz / secZed / secDomal / secRp)
+  taaki dark mode me bhi sahi rahe — pehle yahan hard-coded hex the.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/card">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="24dp">
 
         <!-- ============ BUSINESS INFO ============ -->
-        <TextView style="@style/SecHead" android:text="BUSINESS INFO"
-            android:textColor="#7C3AED"/>
+        <TextView style="@style/SecHead" android:text="Business info"
+            android:textAllCaps="false" android:layout_marginTop="4dp"
+            android:textColor="@color/secBiz"/>
 
-        <LinearLayout style="@style/FieldBox">
-            <TextView style="@style/FieldLabel" android:text="SHOP / COMPANY NAME"/>
+        <LinearLayout style="@style/FieldBox" android:layout_width="match_parent">
+            <TextView style="@style/FieldLabel" android:text="SHOP / COMPANY NAME" android:labelFor="@+id/sBizName"/>
             <EditText android:id="@+id/sBizName" style="@style/FieldInput"
+                android:inputType="text" android:gravity="start|center_vertical"
+                android:textStyle="normal"
                 android:hint="e.g. XXXX XXXX"/>
         </LinearLayout>
 
-        <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
-            <TextView style="@style/FieldLabel" android:text="ADDRESS"/>
+        <LinearLayout style="@style/FieldBox" android:layout_width="match_parent"
+            android:layout_marginTop="10dp">
+            <TextView style="@style/FieldLabel" android:text="ADDRESS" android:labelFor="@+id/sBizAddr"/>
             <EditText android:id="@+id/sBizAddr" style="@style/FieldInput"
+                android:inputType="text" android:gravity="start|center_vertical"
+                android:textStyle="normal"
                 android:hint="e.g. XXXXXX XXXXXX"/>
         </LinearLayout>
 
-        <LinearLayout style="@style/FieldBox" android:layout_marginTop="6dp">
-            <TextView style="@style/FieldLabel" android:text="MOBILE NUMBER"/>
+        <LinearLayout style="@style/FieldBox" android:layout_width="match_parent"
+            android:layout_marginTop="10dp">
+            <TextView style="@style/FieldLabel" android:text="MOBILE NUMBER" android:labelFor="@+id/sBizMobile"/>
             <EditText android:id="@+id/sBizMobile" style="@style/FieldInput"
+                android:gravity="start|center_vertical" android:textStyle="normal"
                 android:hint="e.g. XXXXX XXXXX"
                 android:inputType="phone"/>
         </LinearLayout>
 
         <!-- ============ UNIT & STOCK ============ -->
-        <TextView style="@style/SecHead" android:text="UNIT &amp; STOCK"
-            android:layout_marginTop="12dp"/>
+        <TextView style="@style/SecHead" android:text="Unit &amp; stock"
+            android:textAllCaps="false" android:textColor="@color/acc"/>
         <RadioGroup android:id="@+id/rgUnit"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal">
             <RadioButton android:id="@+id/rbIn" android:layout_width="0dp"
                 android:layout_weight="1" android:layout_height="wrap_content"
+                android:minHeight="@dimen/ou_row_min"
+                android:textSize="15sp" android:textColor="@color/txt"
+                android:buttonTint="@color/acc"
                 android:text="INCH" android:checked="true"/>
             <RadioButton android:id="@+id/rbMm" android:layout_width="0dp"
                 android:layout_weight="1" android:layout_height="wrap_content"
+                android:minHeight="@dimen/ou_row_min"
+                android:textSize="15sp" android:textColor="@color/txt"
+                android:buttonTint="@color/acc"
                 android:text="MM"/>
         </RadioGroup>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:baselineAligned="false">
+            android:orientation="horizontal" android:baselineAligned="false"
+            android:layout_marginTop="14dp">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="STOCK PIPE"/>
+                <TextView style="@style/FieldLabel" android:text="STOCK PIPE" android:labelFor="@+id/sStock"/>
                 <EditText android:id="@+id/sStock" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="BLADE / KERF"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="BLADE / KERF" android:labelFor="@+id/sKerf"/>
                 <EditText android:id="@+id/sKerf" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
 
         <!-- ============ ZED ============ -->
-        <TextView style="@style/SecHead" android:text="ZED  —  DEDUCTION (INCH)"
-            android:textColor="#2563EB"/>
+        <TextView style="@style/SecHead" android:text="Zed  —  deduction (inch)"
+            android:textAllCaps="false" android:textColor="@color/secZed"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit"/>
+                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit" android:labelFor="@+id/zDw"/>
                 <EditText android:id="@+id/zDw" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="SUTTER H"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="SUTTER H" android:labelFor="@+id/zDh"/>
                 <EditText android:id="@+id/zDh" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="10dp">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="MULIYA H"/>
+                <TextView style="@style/FieldLabel" android:text="MULIYA H" android:labelFor="@+id/zDm"/>
                 <EditText android:id="@+id/zDm" style="@style/FieldInput"/>
             </LinearLayout>
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="GLASS"/>
+                <TextView style="@style/FieldLabel" android:text="GLASS" android:labelFor="@+id/zDg"/>
                 <EditText android:id="@+id/zDg" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="RP = W −"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="RP = W −" android:labelFor="@+id/zRpDed"/>
                 <EditText android:id="@+id/zRpDed" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
 
         <!-- ============ DOMAL ============ -->
-        <TextView style="@style/SecHead" android:text="DOMAL  —  DEDUCTION (INCH)"
-            android:textColor="#0EA5E9"/>
+        <TextView style="@style/SecHead" android:text="Domal  —  deduction (inch)"
+            android:textAllCaps="false" android:textColor="@color/secDomal"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit"/>
+                <TextView style="@style/FieldLabel" android:text="SUTTER W /unit" android:labelFor="@+id/dDw"/>
                 <EditText android:id="@+id/dDw" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="SUTTER H"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="SUTTER H" android:labelFor="@+id/dDh"/>
                 <EditText android:id="@+id/dDh" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="10dp">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="RT H"/>
+                <TextView style="@style/FieldLabel" android:text="RT H" android:labelFor="@+id/dDm"/>
                 <EditText android:id="@+id/dDm" style="@style/FieldInput"/>
             </LinearLayout>
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="GLASS"/>
+                <TextView style="@style/FieldLabel" android:text="GLASS" android:labelFor="@+id/dDg"/>
                 <EditText android:id="@+id/dDg" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="RP = W −"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="RP = W −" android:labelFor="@+id/dRpDed"/>
                 <EditText android:id="@+id/dRpDed" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
 
         <!-- ============ RP ============ -->
-        <TextView style="@style/SecHead" android:text="RP GRILL  (BOTH SYSTEMS)"
-            android:textColor="#EC4899"/>
+        <TextView style="@style/SecHead" android:text="RP grill  (both systems)"
+            android:textAllCaps="false" android:textColor="@color/secRp"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="MID GAP"/>
+                <TextView style="@style/FieldLabel" android:text="MID GAP" android:labelFor="@+id/sRpGap"/>
                 <EditText android:id="@+id/sRpGap" style="@style/FieldInput"/>
             </LinearLayout>
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="MIN SPACE"/>
+                <TextView style="@style/FieldLabel" android:text="MIN SPACE" android:labelFor="@+id/sRpMin"/>
                 <EditText android:id="@+id/sRpMin" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="MAX SPACE"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="MAX SPACE" android:labelFor="@+id/sRpMax"/>
                 <EditText android:id="@+id/sRpMax" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
+
         <CheckBox android:id="@+id/cbRp"
             android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Include RP grill" android:checked="true"
-            android:layout_marginTop="6dp"/>
+            android:minHeight="@dimen/ou_row_min"
+            android:text="Include RP grill" android:textSize="15sp"
+            android:textColor="@color/txt"
+            android:paddingStart="6dp"
+            android:checked="true"
+            android:buttonTint="@color/acc"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
 </ScrollView>

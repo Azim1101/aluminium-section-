@@ -50,8 +50,19 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
 
     @Override public void onBindViewHolder(@NonNull VH h, int pos) { h.bind(pos); }
 
+    /**
+     * A blank row was appended at the end. Only announce the insertion — never
+     * rebind the whole list here, otherwise the row being typed in gets its
+     * caret reset to 0 and "2" + "5" turns into "52".
+     */
+    public void notifyItemAppended() {
+        notifyItemInserted(items.size() - 1);
+    }
+
     class VH extends RecyclerView.ViewHolder {
-        TextView tvNo, tvSutter, tvSys, btnDel;
+        TextView tvNo, tvSutter, tvSys;
+        /** delete cell: ImageButton (v2) — View rakhna zaroori hai */
+        android.view.View btnDel;
         EditText etH, etW, etRp;
         WindowItem cur;
         boolean binding = false;
@@ -64,7 +75,7 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             tvSutter = v.findViewById(R.id.tvSutter);
             tvSys = v.findViewById(R.id.tvSys);
             etRp = v.findViewById(R.id.etRp);
-            btnDel = v.findViewById(R.id.btnDel);
+            btnDel = v.findViewById(R.id.btnDel);   // View, not TextView (v2 icon)   // View, not TextView (v2 icon)
 
             /* H change -> auto RP recalculate */
             etH.addTextChangedListener(new TextWatcher() {
@@ -140,7 +151,7 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             if (cur == null) return;
             List<CustomFormulaManager.CustomSystem> systems = CustomFormulaManager.getSystems(tvSys.getContext());
             String text = "Z";
-            int color = 0xFF3B82F6; // default blue
+            int color = com.digitalalu.alu.ui.V2.col(tvSys.getContext(), com.digitalalu.alu.R.color.acc); // default blue
             if (cur.system >= 0 && cur.system < systems.size()) {
                 String name = systems.get(cur.system).name;
                 text = name.substring(0, Math.min(name.length(), 3)).toUpperCase();
@@ -152,7 +163,9 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             gd.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
             gd.setColor(color);
             float density = tvSys.getContext().getResources().getDisplayMetrics().density;
-            gd.setStroke((int)(0.7f * density), 0xFFD1D5DB);
+            gd.setStroke((int)(0.7f * density),
+                    com.digitalalu.alu.ui.V2.col(tvSys.getContext(), com.digitalalu.alu.R.color.line));
+            gd.setCornerRadius(8f * density);
             tvSys.setBackground(gd);
         }
 
@@ -175,9 +188,21 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             if (cur == null) return;
             Engine.WinResult r = Engine.calc(cur, st);
             binding = true;
-            if (cur.isEmpty() || r.rpAutoQty <= 0) etRp.setText("");
-            else etRp.setText(String.valueOf(r.rpAutoQty));
+            setCell(etRp, (cur.isEmpty() || r.rpAutoQty <= 0) ? "" : String.valueOf(r.rpAutoQty));
             binding = false;
+        }
+
+        /**
+         * Writes text into a cell without stealing the caret.
+         * Skips the write entirely when the field already shows this value.
+         */
+        private void setCell(EditText et, String text) {
+            String now = et.getText() == null ? "" : et.getText().toString();
+            if (CellText.keepWhileTyping(now, text, et.isFocused())) return;
+            int sel = et.getSelectionStart();
+            if (sel < 0) sel = text.length();
+            et.setText(text);
+            et.setSelection(Math.min(sel, text.length()));
         }
 
         void bind(int pos) {
@@ -185,14 +210,22 @@ public class RowAdapter extends RecyclerView.Adapter<RowAdapter.VH> {
             cur = items.get(pos);
             tvNo.setText(String.valueOf(pos + 1));
 
-            etH.setText(cur.h > 0 ? trim(cur.h) : "");
-            etW.setText(cur.w > 0 ? trim(cur.w) : "");
+            setCell(etH, cur.h > 0 ? trim(cur.h) : "");
+            setCell(etW, cur.w > 0 ? trim(cur.w) : "");
             tvSutter.setText(String.valueOf(cur.sutter));
             paintSys();
 
+            // UX-audit fix: TalkBack reads "Row 3 Height 48" instead of a bare
+            // "48" — the table columns have no programmatic label otherwise.
+            String rowTag = "Row " + (pos + 1);
+            etH.setContentDescription(rowTag + " Height" + (cur.h > 0 ? " " + trim(cur.h) : ""));
+            etW.setContentDescription(rowTag + " Width" + (cur.w > 0 ? " " + trim(cur.w) : ""));
+            if (etRp != null) etRp.setContentDescription(rowTag + " RP quantity");
+            if (btnDel != null) btnDel.setContentDescription(rowTag + " delete");
+
             Engine.WinResult r = Engine.calc(cur, st);
             int show = cur.rpQty > 0 ? cur.rpQty : r.rpAutoQty;
-            etRp.setText((cur.isEmpty() || show <= 0) ? "" : String.valueOf(show));
+            setCell(etRp, (cur.isEmpty() || show <= 0) ? "" : String.valueOf(show));
 
             binding = false;
             mark();

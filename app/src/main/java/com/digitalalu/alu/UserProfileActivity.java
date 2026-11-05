@@ -30,12 +30,12 @@ public class UserProfileActivity extends AppCompatActivity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFF4F6FB);
+        root.setBackgroundColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.bg));
 
         // ----- Top Bar -----
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setBackgroundColor(0xFF2563EB);
+        top.setBackgroundColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.acc));
         top.setPadding(dp(16), dp(12), dp(16), dp(12));
         top.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -73,7 +73,7 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView headerTitle = new TextView(this);
         headerTitle.setText("App Owner Details");
         headerTitle.setTextSize(16);
-        headerTitle.setTextColor(0xFF152236);
+        headerTitle.setTextColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.txt));
         headerTitle.setTypeface(null, Typeface.BOLD);
         headerTitle.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams httP = new LinearLayout.LayoutParams(-2, -2);
@@ -84,7 +84,7 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView headerSub = new TextView(this);
         headerSub.setText("Aapki details yahan save hongi");
         headerSub.setTextSize(12);
-        headerSub.setTextColor(0xFF66758C);
+        headerSub.setTextColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.mut));
         headerSub.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams hstP = new LinearLayout.LayoutParams(-2, -2);
         hstP.topMargin = dp(4);
@@ -131,7 +131,7 @@ public class UserProfileActivity extends AppCompatActivity {
         btnSave.setTextColor(Color.WHITE);
         btnSave.setTextSize(15);
         btnSave.setTypeface(null, Typeface.BOLD);
-        btnSave.setBackgroundColor(0xFF2563EB);
+        btnSave.setBackgroundColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.acc));
         btnSave.setAllCaps(true);
         btnSave.setPadding(dp(16), dp(14), dp(16), dp(14));
         btnSave.setOnClickListener(v -> saveProfile());
@@ -142,7 +142,7 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView info = new TextView(this);
         info.setText("\u2139\uFE0F Yeh details app ke agent (ALU Assistant) use karega aapko personalized help dene ke liye. Aapke device pe hi save hoga — kahin share nahi hota.");
         info.setTextSize(11);
-        info.setTextColor(0xFF66758C);
+        info.setTextColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.mut));
         info.setPadding(dp(4), dp(8), dp(4), dp(8));
         content.addView(info);
 
@@ -177,7 +177,7 @@ public class UserProfileActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextSize(10);
-        tv.setTextColor(0xFF66758C);
+        tv.setTextColor(com.digitalalu.alu.ui.V2.col(UserProfileActivity.this, com.digitalalu.alu.R.color.mut));
         tv.setTypeface(null, Typeface.BOLD);
         tv.setLetterSpacing(0.06f);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);

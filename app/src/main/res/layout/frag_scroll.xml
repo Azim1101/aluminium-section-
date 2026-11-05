@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI scroll page (16dp page margin) -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:scrollbars="none"
+    android:clipToPadding="false"
     android:fillViewport="true">
     <LinearLayout
         android:id="@+id/box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp"/>
+        android:paddingStart="@dimen/ou_page_margin"
+        android:paddingEnd="@dimen/ou_page_margin"
+        android:paddingTop="6dp"
+        android:paddingBottom="20dp"/>
 </ScrollView>

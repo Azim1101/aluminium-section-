@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.digitalalu.alu.R;
 import com.digitalalu.alu.calc.Engine;
 import com.digitalalu.alu.calc.Settings;
 
@@ -23,7 +24,7 @@ public class PipeBarView extends View {
 
     private Engine.Bin bin;
     private double stock;
-    private int color = 0xFF3B82F6;
+    private int color;   // One UI: init() me token se set hota hai
     private Settings st;
 
     private final Paint pFill = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -40,13 +41,16 @@ public class PipeBarView extends View {
     public PipeBarView(Context c, AttributeSet a) { super(c, a); init(); }
 
     private void init() {
-        pWaste.setColor(0xFFE2E8F0);
+        // v3.0.0 One UI: waste / kerf / ink sab theme tokens se, dark mode sahi
+        Context ctx = getContext();
+        color = V2.col(ctx, R.color.acc);
+        pWaste.setColor(V2.col(ctx, R.color.waste));
         // Blade kerf is a thin white gap between coloured cut pieces.
-        pKerf.setColor(0xFFFFFFFF);
+        pKerf.setColor(V2.col(ctx, R.color.kerf));
         pTextWhite.setColor(Color.WHITE);
         pTextWhite.setTextAlign(Paint.Align.CENTER);
         pTextWhite.setFakeBoldText(true);
-        pTextDark.setColor(0xFF334155);
+        pTextDark.setColor(V2.col(ctx, R.color.txt2));
         pTextDark.setTextAlign(Paint.Align.CENTER);
         pTextDark.setFakeBoldText(true);
         pTextLabel.setColor(Color.WHITE);

@@ -1,32 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI colour tokens (LIGHT)
+  Samsung One UI 6/7 palette + Galaxy Violet accent.
+  Har screen inhi tokens ko padhti hai, isliye dark mode apne aap sahi rehta hai.
+-->
 <resources>
-    <color name="acc">#2563EB</color>
-    <color name="accDark">#1D4ED8</color>
-    <color name="accLight">#E8F0FF</color>
-    <color name="bg">#F4F6FB</color>
-    <color name="card">#FFFFFF</color>
-    <color name="line">#E5EAF3</color>
-    <color name="txt">#152236</color>
-    <color name="mut">#66758C</color>
-    <color name="ok">#16A34A</color>
-    <color name="warn">#EA580C</color>
-    <color name="red">#DC2626</color>
-    <color name="cFrame">#3B82F6</color>
-    <color name="cSutter">#22C55E</color>
-    <color name="cMuliya">#8B5CF6</color>
-    <color name="cRp">#EC4899</color>
-    <color name="waste">#D8DFE9</color>
 
-    <!-- WhatsApp Chat Theme Colors -->
-    <color name="wa_teal">#008069</color>
-    <color name="wa_teal_dark">#075E54</color>
-    <color name="wa_green">#00A884</color>
-    <color name="wa_light_green">#E7FFDB</color>
-    <color name="wa_bg">#EFEAE2</color>
-    <color name="wa_bg_pattern">#E5DDD5</color>
-    <color name="wa_bubble_user">#E7FFDB</color>
-    <color name="wa_bubble_agent">#FFFFFF</color>
-    <color name="wa_tick_blue">#53BDEB</color>
-    <color name="wa_text_dark">#111B21</color>
-    <color name="wa_text_muted">#667781</color>
+    <!-- ===== One UI surfaces ===== -->
+    <color name="bg">#F4F5F7</color>            <!-- page background -->
+    <color name="card">#FFFFFF</color>           <!-- raised card -->
+    <color name="card2">#F1F2F5</color>          <!-- sunken / secondary surface -->
+    <color name="card3">#E7E8EC</color>          <!-- track / pressed surface -->
+    <color name="line">#E3E4E9</color>           <!-- hairline divider -->
+    <color name="lineSoft">#EFF0F3</color>       <!-- faintest divider -->
+
+    <!-- ===== One UI ink ===== -->
+    <color name="txt">#1B1B1F</color>            <!-- primary text -->
+    <color name="txt2">#3C3D44</color>           <!-- strong secondary text -->
+    <color name="mut">#6E7078</color>            <!-- secondary text -->
+    <color name="ic">#4A4C54</color>             <!-- icons -->
+    <color name="hint">#A6A8B1</color>           <!-- hint text -->
+    <color name="onAcc">#FFFFFF</color>          <!-- text/icon on accent -->
+    <color name="onDark">#FFFFFF</color>
+
+    <!-- ===== Galaxy Violet accent ===== -->
+    <color name="acc">#6C4CF1</color>
+    <color name="accDark">#5738D6</color>
+    <color name="accLight">#EFEBFF</color>       <!-- soft violet surface -->
+    <color name="accRipple">#2E6C4CF1</color>    <!-- 18% violet ripple -->
+    <color name="accText">#5738D6</color>        <!-- violet text on light bg -->
+
+    <!-- ===== Semantic (One UI system colours) ===== -->
+    <color name="ok">#12A150</color>
+    <color name="okLight">#E7F6ED</color>
+    <color name="okStroke">#BFE6CE</color>
+    <color name="warn">#E08600</color>
+    <color name="warnLight">#FFF3E0</color>
+    <color name="warnStroke">#F5DCAE</color>
+    <color name="red">#D93A32</color>
+    <color name="redLight">#FDECEA</color>
+    <color name="redStroke">#F5C4BF</color>
+
+    <!-- ===== Section accents (settings dialog groups) ===== -->
+    <color name="secZed">#6C4CF1</color>
+    <color name="secDomal">#0E8FA8</color>
+    <color name="secRp">#E0447C</color>
+    <color name="secBiz">#12A150</color>
+
+    <!-- ===== Part / series colours (data viz) ===== -->
+    <color name="cFrame">#6C4CF1</color>
+    <color name="cSutter">#12A150</color>
+    <color name="cMuliya">#E08600</color>
+    <color name="cRp">#E0447C</color>
+    <color name="cSky">#0E8FA8</color>
+    <color name="waste">#DEE0E6</color>
+    <color name="kerf">#FFFFFF</color>
+
+    <!-- ===== Legacy names, re-pointed at One UI tokens =====
+         (chat screen ab Samsung Messages style hai; purane WhatsApp tokens
+          isi violet/card surface par map hain taaki koi reference na toote) -->
+    <color name="wa_teal">@color/acc</color>
+    <color name="wa_teal_dark">@color/accDark</color>
+    <color name="wa_green">@color/acc</color>
+    <color name="wa_light_green">@color/accLight</color>
+    <color name="wa_bg">@color/bg</color>
+    <color name="wa_bg_pattern">@color/card2</color>
+    <color name="wa_bubble_user">@color/acc</color>
+    <color name="wa_bubble_agent">@color/card</color>
+    <color name="wa_tick_blue">@color/acc</color>
+    <color name="wa_text_dark">@color/txt</color>
+    <color name="wa_text_muted">@color/mut</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="scrim">#66000000</color>
 </resources>

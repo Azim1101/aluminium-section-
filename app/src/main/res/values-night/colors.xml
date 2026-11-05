@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI colour tokens (DARK)
+  One UI 6/7 dark = true black page (AMOLED), #17171B cards, brighter violet.
+-->
+<resources>
+
+    <!-- ===== One UI surfaces ===== -->
+    <color name="bg">#000000</color>
+    <color name="card">#17171B</color>
+    <color name="card2">#212126</color>
+    <color name="card3">#2C2C33</color>
+    <color name="line">#2E2E35</color>
+    <color name="lineSoft">#232329</color>
+
+    <!-- ===== One UI ink ===== -->
+    <color name="txt">#F4F4F7</color>
+    <color name="txt2">#DEDEE5</color>
+    <color name="mut">#9C9DA7</color>
+    <color name="ic">#CBCBD5</color>
+    <color name="hint">#6C6D77</color>
+    <color name="onAcc">#FFFFFF</color>
+    <color name="onDark">#FFFFFF</color>
+
+    <!-- ===== Galaxy Violet accent (dark: thoda bright, black par readable) ===== -->
+    <color name="acc">#9C86FF</color>
+    <color name="accDark">#7E63F0</color>
+    <color name="accLight">#241E40</color>
+    <color name="accRipple">#3D9C86FF</color>
+    <color name="accText">#B4A2FF</color>
+
+    <!-- ===== Semantic ===== -->
+    <color name="ok">#3DD07A</color>
+    <color name="okLight">#12291C</color>
+    <color name="okStroke">#1E4A31</color>
+    <color name="warn">#FFA733</color>
+    <color name="warnLight">#2C2113</color>
+    <color name="warnStroke">#4E3A1C</color>
+    <color name="red">#FF6B60</color>
+    <color name="redLight">#2E1715</color>
+    <color name="redStroke">#552824</color>
+
+    <!-- ===== Section accents ===== -->
+    <color name="secZed">#9C86FF</color>
+    <color name="secDomal">#4CC7E0</color>
+    <color name="secRp">#FF7BB0</color>
+    <color name="secBiz">#3DD07A</color>
+
+    <!-- ===== Part / series colours ===== -->
+    <color name="cFrame">#9C86FF</color>
+    <color name="cSutter">#3DD07A</color>
+    <color name="cMuliya">#FFB05C</color>
+    <color name="cRp">#FF7BB0</color>
+    <color name="cSky">#4CC7E0</color>
+    <color name="waste">#2A2A31</color>
+    <color name="kerf">#000000</color>
+
+    <!-- ===== Legacy WhatsApp tokens -> One UI dark surfaces ===== -->
+    <color name="wa_teal">@color/acc</color>
+    <color name="wa_teal_dark">@color/accDark</color>
+    <color name="wa_green">@color/acc</color>
+    <color name="wa_light_green">@color/accLight</color>
+    <color name="wa_bg">@color/bg</color>
+    <color name="wa_bg_pattern">@color/card2</color>
+    <color name="wa_bubble_user">@color/acc</color>
+    <color name="wa_bubble_agent">@color/card</color>
+    <color name="wa_tick_blue">@color/acc</color>
+    <color name="wa_text_dark">@color/txt</color>
+    <color name="wa_text_muted">@color/mut</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="scrim">#99000000</color>
+</resources>

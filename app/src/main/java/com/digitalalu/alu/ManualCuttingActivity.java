@@ -143,7 +143,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         Card cuts = card("CUT SIZES");
         pipeRows = vertical();
         cuts.body.addView(pipeRows);
-        MaterialButton add = actionButton("+  ADD CUT SIZE", 0xFF2563EB);
+        MaterialButton add = actionButton("+  ADD CUT SIZE", com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.acc));
         add.setOnClickListener(v -> {
             readPipeSettings(false);
             showPipeCutDialog(null);
@@ -151,7 +151,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         cuts.body.addView(add);
         body.addView(cuts.outer);
 
-        MaterialButton optimize = actionButton("OPTIMIZE PIPE CUTTING", 0xFF16A34A);
+        MaterialButton optimize = actionButton("OPTIMIZE PIPE CUTTING", com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.ok));
         optimize.setOnClickListener(v -> optimizePipes());
         LinearLayout.LayoutParams optimizeLp = new LinearLayout.LayoutParams(-1, dp(48));
         optimizeLp.bottomMargin = dp(10);
@@ -271,7 +271,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         summary.body.addView(kv("Cut material", dimU(pipePlan.fittedCutLength)));
         summary.body.addView(kv("Usage", pct(pipePlan.utilization())));
         summary.body.addView(kv("Blade / kerf loss", dimU(pipePlan.kerfLoss)));
-        summary.body.addView(bigKv("LEFTOVER / OFFCUT", dimU(pipePlan.offcut()), 0xFFEA580C));
+        summary.body.addView(bigKv("LEFTOVER / OFFCUT", dimU(pipePlan.offcut()), com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.warn)));
         if (!pipePlan.oversized.isEmpty()) {
             summary.body.addView(warning("" + pipePlan.oversized.size()
                     + " cut(s) are longer than the selected stock pipe."));
@@ -292,7 +292,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
             c.body.addView(kv("Used", dimU(bar.used) + " / " + dimU(pipeStock)));
             c.body.addView(kv("Left", dimU(Math.max(0, bar.free(pipeStock)))));
             PipeBarView visual = new PipeBarView(this);
-            visual.setData(toEngineBin(bar), pipeStock, 0xFF2563EB, st);
+            visual.setData(toEngineBin(bar), pipeStock, com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.acc), st);
             LinearLayout.LayoutParams vp = new LinearLayout.LayoutParams(-1, -2);
             vp.topMargin = dp(4);
             c.body.addView(visual, vp);
@@ -304,6 +304,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
     private Engine.Bin toEngineBin(ManualCuttingEngine.PipeBar bar) {
         Engine.Bin output = new Engine.Bin();
         output.used = bar.used;
+        output.stockLen = pipeStock;
         for (ManualCuttingEngine.PipePiece p : bar.pieces) {
             String shortName = p.name == null || p.name.trim().isEmpty() ? "CUT" : p.name.trim();
             if (shortName.length() > 8) shortName = shortName.substring(0, 8);
@@ -347,7 +348,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         cbFace = new CheckBox(this);
         cbFace.setText("FACE CUTTING - lock sheet face / pattern (NO ROTATION)");
         cbFace.setTextSize(12.5f);
-        cbFace.setTextColor(0xFF152236);
+        cbFace.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         cbFace.setTypeface(null, Typeface.BOLD);
         cbFace.setPadding(0, dp(6), 0, 0);
         cbFace.setChecked(faceCut);
@@ -360,12 +361,12 @@ public class ManualCuttingActivity extends AppCompatActivity {
         rbFaceHeight.setId(View.generateViewId());
         rbFaceHeight.setText("Face is on SHEET HEIGHT - first size follows Height");
         rbFaceHeight.setTextSize(12f);
-        rbFaceHeight.setTextColor(0xFF334155);
+        rbFaceHeight.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         rbFaceWidth = new RadioButton(this);
         rbFaceWidth.setId(View.generateViewId());
         rbFaceWidth.setText("Face is on SHEET WIDTH - first size follows Width");
         rbFaceWidth.setTextSize(12f);
-        rbFaceWidth.setTextColor(0xFF334155);
+        rbFaceWidth.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         radio.addView(rbFaceHeight);
         radio.addView(rbFaceWidth);
         if (faceAxis == ManualCuttingEngine.FACE_WIDTH) rbFaceWidth.setChecked(true);
@@ -399,7 +400,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         Card cuts = card("SHEET PIECE SIZES");
         sheetRows = vertical();
         cuts.body.addView(sheetRows);
-        MaterialButton add = actionButton("+  ADD SHEET PIECE", 0xFF2563EB);
+        MaterialButton add = actionButton("+  ADD SHEET PIECE", com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.acc));
         add.setOnClickListener(v -> {
             readSheetSettings(false);
             showSheetCutDialog(null);
@@ -407,7 +408,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         cuts.body.addView(add);
         body.addView(cuts.outer);
 
-        MaterialButton optimize = actionButton("OPTIMIZE SHEET CUTTING", 0xFF16A34A);
+        MaterialButton optimize = actionButton("OPTIMIZE SHEET CUTTING", com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.ok));
         optimize.setOnClickListener(v -> optimizeSheets());
         LinearLayout.LayoutParams optimizeLp = new LinearLayout.LayoutParams(-1, dp(48));
         optimizeLp.bottomMargin = dp(10);
@@ -555,7 +556,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         summary.body.addView(kv("Sheets required", sheetPlan.sheetCount() + " pcs"));
         summary.body.addView(kv("Piece material", area(sheetPlan.placedArea)));
         summary.body.addView(kv("Usage", pct(sheetPlan.utilization())));
-        summary.body.addView(bigKv("WASTE / SCRAP", area(sheetPlan.waste()), 0xFFEA580C));
+        summary.body.addView(bigKv("WASTE / SCRAP", area(sheetPlan.waste()), com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.warn)));
         if (faceCut) summary.body.addView(note(faceDirectionText() + " - all pieces stay in this direction."));
         else summary.body.addView(note("Normal optimization: pieces may rotate for a tighter layout."));
         if (sheetGap > 0) summary.body.addView(note("Waste includes the reserved " + dimU(sheetGap)
@@ -754,7 +755,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         head.setTextSize(12f);
         head.setTypeface(null, Typeface.BOLD);
         head.setLetterSpacing(.05f);
-        head.setTextColor(0xFF2563EB);
+        head.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.acc));
         head.setPadding(0, 0, 0, dp(7));
         outer.addView(head);
 
@@ -786,7 +787,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         text.setText(label);
         text.setTextSize(9.5f);
         text.setTypeface(null, Typeface.BOLD);
-        text.setTextColor(0xFF66758C);
+        text.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         text.setLetterSpacing(.04f);
         text.setPadding(dp(2), 0, 0, dp(2));
         box.addView(text);
@@ -803,11 +804,11 @@ public class ManualCuttingActivity extends AppCompatActivity {
         button.setLetterSpacing(.03f);
         button.setAllCaps(false);
         button.setBackgroundTintList(ColorStateList.valueOf(color));
-        button.setCornerRadius(dp(10));
+        button.setCornerRadius(dp(24));   // One UI: full pill
         button.setInsetTop(0);
         button.setInsetBottom(0);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(44));
-        lp.topMargin = dp(8);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(48));
+        lp.topMargin = dp(10);
         button.setLayoutParams(lp);
         return button;
     }
@@ -819,7 +820,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         field.setSingleLine(true);
         field.setTextSize(14f);
         field.setTypeface(null, Typeface.BOLD);
-        field.setTextColor(0xFF152236);
+        field.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         field.setGravity(Gravity.CENTER);
         field.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         field.setBackgroundResource(R.drawable.bg_input);
@@ -838,7 +839,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         field.setText(value == null ? "" : value);
         field.setSingleLine(true);
         field.setTextSize(14f);
-        field.setTextColor(0xFF152236);
+        field.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         field.setBackgroundResource(R.drawable.bg_input);
         field.setPadding(dp(10), 0, dp(10), 0);
         return field;
@@ -856,7 +857,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         title.setText(label);
         title.setTextSize(10f);
         title.setTypeface(null, Typeface.BOLD);
-        title.setTextColor(0xFF66758C);
+        title.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         title.setLetterSpacing(.04f);
         LinearLayout.LayoutParams tLp = new LinearLayout.LayoutParams(-1, -2);
         tLp.topMargin = dp(6);
@@ -881,7 +882,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView view = new TextView(this);
         view.setText(text);
         view.setTextSize(13f);
-        view.setTextColor(0xFF152236);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         view.setTypeface(null, Typeface.BOLD);
         return view;
     }
@@ -890,7 +891,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView view = new TextView(this);
         view.setText(text);
         view.setTextSize(11.5f);
-        view.setTextColor(0xFF66758C);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         view.setPadding(0, dp(2), 0, 0);
         return view;
     }
@@ -898,7 +899,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
     private TextView deleteButton() {
         TextView view = new TextView(this);
         view.setText("×");
-        view.setTextColor(0xFFDC2626);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.red));
         view.setTextSize(28f);
         view.setGravity(Gravity.CENTER);
         view.setContentDescription("Remove");
@@ -910,7 +911,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView view = new TextView(this);
         view.setText(message);
         view.setTextSize(11.5f);
-        view.setTextColor(0xFF66758C);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         view.setPadding(0, dp(2), 0, dp(3));
         return view;
     }
@@ -919,7 +920,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView view = new TextView(this);
         view.setText(message);
         view.setTextSize(12.5f);
-        view.setTextColor(0xFF94A3B8);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         view.setGravity(Gravity.CENTER);
         view.setPadding(dp(6), dp(14), dp(6), dp(14));
         return view;
@@ -930,9 +931,9 @@ public class ManualCuttingActivity extends AppCompatActivity {
         view.setText("!  " + message);
         view.setTextSize(11.5f);
         view.setTypeface(null, Typeface.BOLD);
-        view.setTextColor(0xFFB45309);
+        view.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.warn));
         view.setPadding(dp(8), dp(7), dp(8), dp(7));
-        view.setBackgroundColor(0xFFFFF7ED);
+        view.setBackgroundColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.warnLight));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.topMargin = dp(6);
         view.setLayoutParams(lp);
@@ -947,12 +948,12 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView left = new TextView(this);
         left.setText(key);
         left.setTextSize(12f);
-        left.setTextColor(0xFF66758C);
+        left.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         left.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
         TextView right = new TextView(this);
         right.setText(value);
         right.setTextSize(12.5f);
-        right.setTextColor(0xFF152236);
+        right.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.txt));
         right.setTypeface(null, Typeface.BOLD);
         right.setGravity(Gravity.END);
         row.addView(left);
@@ -965,7 +966,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(9), dp(7), dp(9), dp(7));
-        row.setBackgroundColor(0xFFF1F5F9);
+        row.setBackgroundColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.card2));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
         lp.topMargin = dp(5);
         lp.bottomMargin = dp(3);
@@ -973,7 +974,7 @@ public class ManualCuttingActivity extends AppCompatActivity {
         TextView left = new TextView(this);
         left.setText(key);
         left.setTextSize(10.5f);
-        left.setTextColor(0xFF475569);
+        left.setTextColor(com.digitalalu.alu.ui.V2.col(ManualCuttingActivity.this, com.digitalalu.alu.R.color.mut));
         left.setTypeface(null, Typeface.BOLD);
         left.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
         TextView right = new TextView(this);

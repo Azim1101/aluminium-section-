@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — Samsung One UI home screen.
+  Large-title header (28sp) + page dots + ViewPager2 + flat One UI bottom nav
+  with a violet pill indicator behind the selected tab.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -6,19 +11,18 @@
     android:orientation="vertical"
     android:background="@color/bg">
 
-    <!-- ============ TOP BAR ============ -->
+    <!-- ============ ONE UI LARGE-TITLE HEADER ============ -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/acc"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="16dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:elevation="4dp">
+        android:background="@color/bg"
+        android:paddingStart="24dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -29,127 +33,111 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ALU WINDOW"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.03"/>
+                android:text="@string/ou_app_kicker"
+                style="@style/OuKicker"/>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/OuTitle"
+                android:layout_marginTop="2dp"
+                android:text="Windows"/>
 
             <TextView
                 android:id="@+id/tvSub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 windows"
-                android:textColor="#CFE0FF"
-                android:textSize="11sp"/>
+                style="@style/OuCaption"
+                android:layout_marginTop="3dp"
+                android:textSize="13sp"
+                android:text="0 windows"/>
         </LinearLayout>
 
         <ImageButton
             android:id="@+id/btnPrice"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_rupee"
+            style="@style/HeaderIcon"
+            android:src="@drawable/ic_v2_rupee"
             android:contentDescription="Price"
-            app:tint="#FFFFFF"/>
+            app:tint="@color/ic"/>
 
         <ImageButton
             android:id="@+id/btnProfile"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_profile"
+            style="@style/HeaderIcon"
+            android:src="@drawable/ic_v2_person"
             android:contentDescription="Customers"
-            app:tint="#FFFFFF"/>
+            app:tint="@color/ic"/>
 
         <ImageButton
-            android:id="@+id/btnAiAgent"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_ai_agent"
-            android:contentDescription="AI Agent"
-            app:tint="#FFFFFF"/>
+            android:id="@+id/btnShare"
+            style="@style/HeaderIcon"
+            android:src="@drawable/ic_v2_share"
+            android:contentDescription="Share"
+            app:tint="@color/ic"/>
 
         <ImageButton
             android:id="@+id/btnSettings"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_preferences"
+            style="@style/HeaderIcon"
+            android:src="@drawable/ic_v2_sliders"
             android:contentDescription="Settings"
-            app:tint="#FFFFFF"/>
-
-        <ImageButton
-            android:id="@+id/btnMore"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_more"
-            android:contentDescription="More"
-            app:tint="#FFFFFF"/>
+            app:tint="@color/ic"/>
     </LinearLayout>
 
-    <!-- ============ TABS ============ -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
+    <!-- ============ PAGE DOTS ============ -->
+    <LinearLayout
+        android:id="@+id/dots"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/card"
-        app:tabIndicatorColor="@color/acc"
-        app:tabIndicatorHeight="3dp"
-        app:tabSelectedTextColor="@color/acc"
-        app:tabTextColor="@color/mut"
-        app:tabMode="fixed"
-        app:tabTextAppearance="@style/TextAppearance.MaterialComponents.Button"/>
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="2dp"
+        android:paddingBottom="6dp"/>
 
     <!-- ============ CONTENT ============ -->
-    <FrameLayout
-        android:id="@+id/container"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <!-- ============ BOTTOM ACTION BAR — WhatsApp | Excel ============ -->
+    <!-- ============ ONE UI FLAT BOTTOM NAV ============ -->
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/card"
-        android:elevation="12dp"
-        android:padding="8dp"
-        android:gravity="center_vertical">
+        android:background="@drawable/bg_bottom_nav"
+        android:minHeight="@dimen/ou_row_min"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:baselineAligned="false">
 
-        <!-- WhatsApp icon button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnWhats"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="46dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="6dp"
-            android:text="📤  WhatsApp"
-            android:textSize="13sp"
-            android:textColor="#25D366"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:cornerRadius="12dp"
-            app:strokeColor="#25D366"/>
+        <LinearLayout android:id="@+id/navWindows" style="@style/NavItem">
+            <ImageView android:id="@+id/navWindowsIcon" style="@style/NavIcon"
+                android:src="@drawable/ic_nav_windows" android:contentDescription="Windows"/>
+            <TextView android:id="@+id/navWindowsText" style="@style/NavLabel" android:text="Windows"/>
+        </LinearLayout>
 
-        <!-- Excel icon button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnExcel"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="46dp"
-            android:layout_weight="1"
-            android:text="📊  Excel"
-            android:textSize="13sp"
-            android:textColor="@color/ok"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/ok"/>
+        <LinearLayout android:id="@+id/navEstimate" style="@style/NavItem">
+            <ImageView android:id="@+id/navEstimateIcon" style="@style/NavIcon"
+                android:src="@drawable/ic_nav_estimate" android:contentDescription="Estimate"/>
+            <TextView android:id="@+id/navEstimateText" style="@style/NavLabel" android:text="Estimate"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/navCutting" style="@style/NavItem">
+            <ImageView android:id="@+id/navCuttingIcon" style="@style/NavIcon"
+                android:src="@drawable/ic_nav_cutting" android:contentDescription="Cutting"/>
+            <TextView android:id="@+id/navCuttingText" style="@style/NavLabel" android:text="Cutting"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/btnAiAgent" style="@style/NavItem">
+            <ImageView android:id="@+id/navAiIcon" style="@style/NavIcon"
+                android:src="@drawable/ic_v2_ai" android:contentDescription="AI Agent"/>
+            <TextView android:id="@+id/navAiText" style="@style/NavLabel" android:text="AI"/>
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/btnMore" style="@style/NavItem">
+            <ImageView android:id="@+id/navMoreIcon" style="@style/NavIcon"
+                android:src="@drawable/ic_v2_more" android:contentDescription="More"/>
+            <TextView android:id="@+id/navMoreText" style="@style/NavLabel" android:text="More"/>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

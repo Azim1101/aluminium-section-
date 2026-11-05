@@ -42,12 +42,12 @@ public class PriceActivity extends AppCompatActivity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFF4F6FB);
+        root.setBackgroundColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.bg));
 
         /* ---- top bar ---- */
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setBackgroundColor(0xFF2563EB);
+        top.setBackgroundColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.acc));
         top.setPadding(dp(16), dp(12), dp(10), dp(12));
         top.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -61,7 +61,7 @@ public class PriceActivity extends AppCompatActivity {
 
         tvLock = new TextView(this);
         tvLock.setText("\uD83D\uDD12  LOCKED");
-        tvLock.setTextColor(0xFFFFD966);
+        tvLock.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.warn));
         tvLock.setTextSize(12);
         tvLock.setTypeface(null, Typeface.BOLD);
         tvLock.setPadding(dp(10), dp(6), dp(10), dp(6));
@@ -98,7 +98,7 @@ public class PriceActivity extends AppCompatActivity {
                 pb.save(this);   // persists legacy → hashed PIN migration
                 unlocked = true;
                 tvLock.setText("\uD83D\uDD13  UNLOCKED");
-                tvLock.setTextColor(0xFF86EFAC);
+                tvLock.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.ok));
                 toast("Unlocked — you can edit now");
                 render();
                 d.dismiss();
@@ -153,7 +153,7 @@ public class PriceActivity extends AppCompatActivity {
         add.setText("+   ADD EXTRA CHARGE");
         add.setTextSize(13);
         add.setTypeface(null, Typeface.BOLD);
-        add.setTextColor(unlocked ? 0xFF2563EB : 0xFFB6C2D3);
+        add.setTextColor(unlocked ? com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.acc) : com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.mut));
         add.setGravity(Gravity.CENTER);
         add.setPadding(0, dp(12), 0, dp(6));
         add.setOnClickListener(v -> {
@@ -180,7 +180,7 @@ public class PriceActivity extends AppCompatActivity {
             cp.setText("Change PIN");
             cp.setTextSize(13);
             cp.setTypeface(null, Typeface.BOLD);
-            cp.setTextColor(0xFFDC2626);
+            cp.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.red));
             cp.setPadding(0, dp(8), 0, dp(8));
             cp.setOnClickListener(v -> changePin());
             p.addView(cp);
@@ -202,9 +202,9 @@ public class PriceActivity extends AppCompatActivity {
         tx.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
         TextView a = new TextView(this);
         a.setText(name); a.setTextSize(13); a.setTypeface(null, Typeface.BOLD);
-        a.setTextColor(0xFF152236);
+        a.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.txt));
         TextView b = new TextView(this);
-        b.setText(unit); b.setTextSize(10.5f); b.setTextColor(0xFF66758C);
+        b.setText(unit); b.setTextSize(10.5f); b.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.mut));
         tx.addView(a); tx.addView(b);
         l.addView(tx);
 
@@ -257,7 +257,7 @@ public class PriceActivity extends AppCompatActivity {
         TextView u = new TextView(this);
         u.setText("  kg/16ft");
         u.setTextSize(10);
-        u.setTextColor(0xFF66758C);
+        u.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.mut));
         l.addView(u);
         return l;
     }
@@ -378,7 +378,7 @@ public class PriceActivity extends AppCompatActivity {
         t.setText(title);
         t.setTextSize(12);
         t.setTypeface(null, Typeface.BOLD);
-        t.setTextColor(0xFF2563EB);
+        t.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.acc));
         t.setLetterSpacing(0.06f);
         t.setPadding(0, 0, 0, dp(8));
         outer.addView(t);
@@ -393,7 +393,7 @@ public class PriceActivity extends AppCompatActivity {
         TextView t = new TextView(this);
         t.setText(s);
         t.setTextSize(11.5f);
-        t.setTextColor(0xFF66758C);
+        t.setTextColor(com.digitalalu.alu.ui.V2.col(PriceActivity.this, com.digitalalu.alu.R.color.mut));
         t.setLineSpacing(dp(3), 1f);
         t.setPadding(0, dp(2), 0, dp(6));
         return t;

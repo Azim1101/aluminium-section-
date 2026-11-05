@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI table row (48dp touch target) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="44dp"
+    android:layout_height="48dp"
     android:orientation="horizontal"
     android:baselineAligned="false">
 
-    <!-- NO -->
     <TextView
         android:id="@+id/tvNo"
         android:layout_width="0dp"
@@ -17,7 +17,6 @@
         android:textStyle="bold"
         android:textColor="@color/mut"/>
 
-    <!-- HEIGHT -->
     <EditText
         android:id="@+id/etH"
         android:layout_width="0dp"
@@ -29,13 +28,12 @@
         android:textSize="14.5sp"
         android:textStyle="bold"
         android:textColor="@color/txt"
-        android:textColorHint="#C7CFDB"
+        android:textColorHint="@color/hint"
         android:hint="—"
         android:maxLines="1"
         android:padding="1dp"
         android:imeOptions="actionNext"/>
 
-    <!-- WIDTH -->
     <EditText
         android:id="@+id/etW"
         android:layout_width="0dp"
@@ -47,13 +45,12 @@
         android:textSize="14.5sp"
         android:textStyle="bold"
         android:textColor="@color/txt"
-        android:textColorHint="#C7CFDB"
+        android:textColorHint="@color/hint"
         android:hint="—"
         android:maxLines="1"
         android:padding="1dp"
         android:imeOptions="actionNext"/>
 
-    <!-- SUTTER -->
     <TextView
         android:id="@+id/tvSutter"
         android:layout_width="0dp"
@@ -63,9 +60,8 @@
         android:gravity="center"
         android:textSize="14.5sp"
         android:textStyle="bold"
-        android:textColor="@color/acc"/>
+        android:textColor="@color/cSutter"/>
 
-    <!-- SYSTEM  Z / D -->
     <TextView
         android:id="@+id/tvSys"
         android:layout_width="0dp"
@@ -73,11 +69,10 @@
         android:layout_height="match_parent"
         android:background="@drawable/cell"
         android:gravity="center"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"/>
+        android:textColor="@color/onAcc"/>
 
-    <!-- RP GRILL -->
     <EditText
         android:id="@+id/etRp"
         android:layout_width="0dp"
@@ -89,12 +84,11 @@
         android:textSize="14.5sp"
         android:textStyle="bold"
         android:textColor="@color/cRp"
-        android:textColorHint="#F0A9CB"
+        android:textColorHint="@color/hint"
         android:hint="—"
         android:maxLines="1"
         android:padding="1dp"/>
 
-    <!-- delete -->
     <TextView
         android:id="@+id/btnDel"
         android:layout_width="0dp"
@@ -104,5 +98,5 @@
         android:gravity="center"
         android:text="✕"
         android:textSize="14sp"
-        android:textColor="#C7CFDB"/>
+        android:textColor="@color/mut"/>
 </LinearLayout>

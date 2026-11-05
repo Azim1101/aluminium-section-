@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.digitalalu.alu.R;
 import com.digitalalu.alu.calc.Settings;
 
 /** Muliya pipe pe RP grill ki marking — vertical lines + beech me gap. */
@@ -27,10 +28,13 @@ public class RpRulerView extends View {
     public RpRulerView(Context c, AttributeSet a) { super(c, a); init(); }
 
     private void init() {
-        pBg.setColor(0xFFF8FAFC);
-        pLine.setColor(0xFFEC4899);
-        pGap.setColor(0x33EC4899);
-        pTxt.setColor(0xFF9CA3AF);
+        // v3.0.0 One UI: RP ruler ab theme tokens se paint hota hai
+        Context ctx = getContext();
+        int rp = V2.col(ctx, R.color.cRp);
+        pBg.setColor(V2.col(ctx, R.color.card2));
+        pLine.setColor(rp);
+        pGap.setColor((rp & 0x00FFFFFF) | 0x33000000);
+        pTxt.setColor(V2.col(ctx, R.color.mut));
         pTxt.setTextAlign(Paint.Align.CENTER);
         pTxt.setFakeBoldText(true);
     }

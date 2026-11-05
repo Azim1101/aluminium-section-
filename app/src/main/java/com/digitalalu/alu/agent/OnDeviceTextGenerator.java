@@ -234,7 +234,7 @@ public class OnDeviceTextGenerator {
             if (ts.pcs <= 0) continue;
             sb.append("• *").append(Engine.nameOf(ts.type)).append("*: ")
               .append(ts.stockNeeded()).append(" pipes (").append(ts.pcs).append(" cuts, waste: ")
-              .append(s.settings.fmtU(ts.waste(s.settings.stock))).append(")\n");
+              .append(s.settings.fmtU(ts.waste())).append(")\n");
         }
 
         List<ChatMessage.Action> actions = new ArrayList<>();
@@ -430,7 +430,7 @@ public class OnDeviceTextGenerator {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Namaste").append(name).append("! 🙏\n\n");
-        sb.append("Main aapka *ALU AI Assistant* hoon. Main on-device AI model se chalta hoon aur aapki puri app ko control kar sakta hoon!\n\n");
+        sb.append("Main aapka *ALU AI Assistant* hoon — window add, cutting plan, pipe aur kharcha sab control karta hoon.\n\n");
         sb.append("Aap mujhse aam bolchal (Hinglish/Hindi) me baat karke kaam karwa sakte hain, jaise:\n");
         sb.append("• *\"48x60 ki 2 window add karo\"*\n");
         sb.append("• *\"Sutter aur muliya size batao\"*\n");

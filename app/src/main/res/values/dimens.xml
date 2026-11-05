@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI metrics.
+  One UI Design Guidelines: thumbnail/card radius 26dp, medium 20dp, small 12dp.
+  List rows >= 56dp touch target; buttons 50dp; page margin 16dp.
+-->
+<resources>
+    <dimen name="ou_radius_card">26dp</dimen>
+    <dimen name="ou_radius_mid">20dp</dimen>
+    <dimen name="ou_radius_small">12dp</dimen>
+    <dimen name="ou_radius_pill">999dp</dimen>
+
+    <dimen name="ou_page_margin">16dp</dimen>
+    <dimen name="ou_card_pad">18dp</dimen>
+    <dimen name="ou_row_min">56dp</dimen>
+    <dimen name="ou_btn_h">50dp</dimen>
+    <dimen name="ou_field_h">48dp</dimen>
+    <dimen name="ou_icon_tile">40dp</dimen>
+    <dimen name="ou_header_icon">44dp</dimen>
+    <dimen name="ou_sheet_radius">26dp</dimen>
+    <dimen name="ou_handle_w">36dp</dimen>
+    <dimen name="ou_handle_h">4dp</dimen>
+
+    <dimen name="ou_title">28sp</dimen>
+    <dimen name="ou_subtitle">17sp</dimen>
+    <dimen name="ou_body">15sp</dimen>
+    <dimen name="ou_caption">12.5sp</dimen>
+</resources>

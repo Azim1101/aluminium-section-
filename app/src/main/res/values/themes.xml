@@ -1,51 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI theme (API < 23 fallback).
+  ou_light_status is false here because android:windowLightStatusBar needs API 23.
+-->
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <bool name="ou_light_status">false</bool>
+
+    <!-- =====================================================================
+         AppTheme — Samsung One UI look.
+         Page-coloured status/navigation bar, violet accent, 26dp cards,
+         pill buttons, One UI dialogs + bottom sheets.
+         ===================================================================== -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/acc</item>
         <item name="colorPrimaryDark">@color/accDark</item>
+        <item name="colorPrimaryVariant">@color/accDark</item>
+        <item name="colorSecondary">@color/acc</item>
+        <item name="colorSecondaryVariant">@color/accDark</item>
         <item name="colorAccent">@color/acc</item>
+        <item name="colorOnPrimary">@color/onAcc</item>
+        <item name="colorOnSecondary">@color/onAcc</item>
+        <item name="colorSurface">@color/card</item>
+        <item name="colorOnSurface">@color/txt</item>
+        <item name="colorError">@color/red</item>
+        <item name="android:colorBackground">@color/bg</item>
+
         <item name="android:windowBackground">@color/bg</item>
-        <item name="android:statusBarColor">@color/accDark</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowLightStatusBar">@bool/ou_light_status</item>
+        <item name="android:textColorPrimary">@color/txt</item>
+        <item name="android:textColorSecondary">@color/mut</item>
+        <item name="android:textColorHint">@color/hint</item>
+        <item name="android:textColorHighlight">@color/accLight</item>
+        <item name="android:colorControlNormal">@color/ic</item>
+        <item name="android:colorControlActivated">@color/acc</item>
+        <item name="android:colorControlHighlight">@color/accRipple</item>
+        <item name="android:fontFamily">sans-serif</item>
+
+        <item name="bottomSheetDialogTheme">@style/AluBottomSheet</item>
+        <item name="materialAlertDialogTheme">@style/AluDialogTheme</item>
+        <item name="alertDialogTheme">@style/AluDialogTheme</item>
+        <item name="android:alertDialogTheme">@style/AluDialogTheme</item>
+        <item name="dialogTheme">@style/AluDialogTheme</item>
     </style>
 
+    <!-- ===== One UI typography ===== -->
+    <style name="OuTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/ou_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/txt</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="OuSubtitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/ou_subtitle</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/txt</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    <style name="OuBody">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/ou_body</item>
+        <item name="android:textColor">@color/txt</item>
+    </style>
+    <style name="OuCaption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/ou_caption</item>
+        <item name="android:textColor">@color/mut</item>
+    </style>
+    <style name="OuKicker">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/acc</item>
+        <item name="android:letterSpacing">0.14</item>
+    </style>
+
+    <!-- ===== One UI form fields ===== -->
     <style name="FieldBox">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:layout_marginEnd">5dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
     </style>
 
     <style name="FieldLabel">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">9.5sp</item>
+        <item name="android:textSize">11.5sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/mut</item>
-        <item name="android:letterSpacing">0.06</item>
-        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:letterSpacing">0.07</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:layout_marginStart">4dp</item>
     </style>
 
     <style name="FieldInput">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">42dp</item>
+        <item name="android:layout_height">@dimen/ou_field_h</item>
         <item name="android:background">@drawable/bg_input</item>
         <item name="android:inputType">numberDecimal</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/txt</item>
+        <item name="android:textColorHint">@color/hint</item>
         <item name="android:gravity">center</item>
         <item name="android:maxLines">1</item>
-        <item name="android:padding">4dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
     </style>
 
+    <!-- One UI group header (section caption) -->
     <style name="SecHead">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">11sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/acc</item>
         <item name="android:letterSpacing">0.09</item>
-        <item name="android:layout_marginTop">14dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+    </style>
+
+    <!-- ===== One UI buttons ===== -->
+    <style name="OuButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/ou_btn_h</item>
+        <item name="android:background">@drawable/bg_btn_primary</item>
+        <item name="android:textColor">@color/onAcc</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:gravity">center</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+    <style name="OuButton.Secondary">
+        <item name="android:background">@drawable/bg_btn_secondary</item>
+        <item name="android:textColor">@color/txt</item>
+    </style>
+    <style name="OuButton.Tonal">
+        <item name="android:background">@drawable/bg_btn_tonal</item>
+        <item name="android:textColor">@color/accText</item>
+    </style>
+
+    <!-- ===== One UI bottom sheet ===== -->
+    <style name="AluBottomSheet" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AluBottomSheetShape</item>
+        <item name="android:backgroundDimAmount">0.42</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">@color/card</item>
+    </style>
+    <style name="AluBottomSheetShape" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="shapeAppearanceOverlay">@style/OuSheetShape</item>
+    </style>
+    <style name="OuSheetShape">
+        <item name="cornerSizeTopLeft">@dimen/ou_sheet_radius</item>
+        <item name="cornerSizeTopRight">@dimen/ou_sheet_radius</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <!-- ===== One UI dialog ===== -->
+    <style name="AluDialogTheme" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/AluDialogStyle</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/OuDialogTitle</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/OuDialogBody</item>
+        <item name="buttonBarPositiveButtonStyle">@style/OuDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/OuDialogButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/OuDialogButton</item>
+    </style>
+    <style name="AluDialogStyle" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearanceOverlay">@style/OuDialogShape</item>
+        <item name="backgroundTint">@color/card</item>
+    </style>
+    <style name="OuDialogShape">
+        <item name="cornerSize">@dimen/ou_radius_card</item>
+    </style>
+    <style name="OuDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textColor">@color/txt</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    <style name="OuDialogBody" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textColor">@color/mut</item>
+        <item name="android:textSize">14.5sp</item>
+    </style>
+    <style name="OuDialogButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/acc</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="rippleColor">@color/accRipple</item>
+    </style>
+
+    <!-- ===== One UI bottom navigation ===== -->
+    <style name="NavItem">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">@dimen/ou_row_min</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">@drawable/bg_ripple_round</item>
+    </style>
+    <style name="NavIcon">
+        <item name="android:layout_width">62dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+    <style name="NavLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/mut</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- ===== One UI sheet list rows ===== -->
+    <style name="SheetRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">68dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:background">@drawable/bg_sheet_row</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="SheetRowIcon">
+        <item name="android:layout_width">@dimen/ou_icon_tile</item>
+        <item name="android:layout_height">@dimen/ou_icon_tile</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/accText</item>
+    </style>
+    <style name="SheetRowTextBox">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginStart">14dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="SheetRowTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/txt</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+    <style name="SheetRowSub">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12.5sp</item>
+        <item name="android:textColor">@color/mut</item>
+        <item name="android:layout_marginTop">2dp</item>
+    </style>
+
+    <!-- ===== One UI header action icon (borderless, violet ripple) ===== -->
+    <style name="HeaderIcon">
+        <item name="android:layout_width">@dimen/ou_header_icon</item>
+        <item name="android:layout_height">@dimen/ou_header_icon</item>
+        <item name="android:layout_marginStart">2dp</item>
+        <item name="android:background">@drawable/bg_icon_chip</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <!-- ===== One UI table cells ===== -->
+    <style name="CellHeadText">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/mut</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:gravity">center</item>
     </style>
 </resources>

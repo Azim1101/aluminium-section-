@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="."?>
+<!--
+  ALU Window v3.0.0 — One UI theme, API 23+.
+  Light status-bar icons OFF (dark icons on the light One UI page background).
+-->
+<resources>
+    <bool name="ou_light_status">true</bool>
+</resources>
