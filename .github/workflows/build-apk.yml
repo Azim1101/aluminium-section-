@@ -19,7 +19,7 @@ permissions:
 jobs:
   build:
     name: Build APK & Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -66,7 +66,7 @@ jobs:
           [ -n "$ALU_KEYSTORE_PASSWORD" ] || { echo "::error::Missing ALU_KEYSTORE_PASSWORD secret"; exit 1; }
           [ -n "$ALU_KEY_ALIAS" ] || { echo "::error::Missing ALU_KEY_ALIAS secret"; exit 1; }
           [ -n "$ALU_KEY_PASSWORD" ] || { echo "::error::Missing ALU_KEY_PASSWORD secret"; exit 1; }
-          gradle assembleDebug assembleRelease --no-daemon --stacktrace
+          gradle testDebugUnitTest assembleDebug assembleRelease --no-daemon --stacktrace
 
       - name: Rename APKs with version name
         run: |
