@@ -33,6 +33,7 @@ import com.digitalalu.alu.calc.PriceBook;
 import com.digitalalu.alu.export.Exporter;
 import com.digitalalu.alu.calc.BackupManager;
 import com.digitalalu.alu.model.Customer;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import com.digitalalu.alu.model.WindowItem;
@@ -41,7 +42,11 @@ import com.digitalalu.alu.ui.PipeBarView;
 import com.digitalalu.alu.ui.RpRulerView;
 import com.digitalalu.alu.ui.RowAdapter;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.viewpager2.widget.ViewPager2;
+import android.widget.ImageView;
+import android.content.res.ColorStateList;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -51,6 +56,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,8 +67,12 @@ public class MainActivity extends AppCompatActivity {
     private Settings st;
     private long seq = 0;
 
-    private FrameLayout container;
-    private TabLayout tabs;
+    private ViewPager2 pager;
+    private LinearLayout dots;
+    private TextView tvTitle;
+    private final ImageView[] navIcons = new ImageView[3];
+    private final TextView[] navTexts = new TextView[3];
+    private static final String[] PAGE_TITLES = {"Windows", "Estimate", "Cutting Plan"};
     private RecyclerView rv;
     private RowAdapter adapter;
     private View sheetView;
@@ -77,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout boxResult, boxPlan;
 
     private static final String PREF = "alu_data";
+    public static final String EXTRA_PAGE = "page";
 
     /* cached calculation */
     private List<Engine.WinResult> res = new ArrayList<>();
@@ -93,26 +104,40 @@ public class MainActivity extends AppCompatActivity {
         pb = PriceBook.load(this);
         InsetsHelper.apply(((ViewGroup) findViewById(android.R.id.content)).getChildAt(0),
                 findViewById(R.id.topBar));
-        container = findViewById(R.id.container);
-        tabs = findViewById(R.id.tabs);
+        pager = findViewById(R.id.pager);
+        dots = findViewById(R.id.dots);
         tvSub = findViewById(R.id.tvSub);
-
-        tabs.addTab(tabs.newTab().setText("WINDOWS"));
-        tabs.addTab(tabs.newTab().setText("ESTIMATE"));
-        tabs.addTab(tabs.newTab().setText("CUTTING"));
+        tvTitle = findViewById(R.id.tvTitle);
 
         buildViews();
         loadData();
+        // v2.9: start loading the on-device AI now (background), so the agent
+        // screen is ready the moment the user opens it.
+        try {
+            com.digitalalu.alu.ai.LocalModelHost.get().ensureLoaded(this,
+                    com.digitalalu.alu.ai.AiSettings.load(this));
+        } catch (Throwable ignored) { }
         if (items.isEmpty()) addWindow(0, 0, 2, 1);
 
-        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            public void onTabSelected(TabLayout.Tab t) { showTab(t.getPosition()); }
-            public void onTabUnselected(TabLayout.Tab t) {}
-            public void onTabReselected(TabLayout.Tab t) {}
+        /* ---- swipe pages (Windows / Estimate / Cutting) ---- */
+        pager.setOffscreenPageLimit(2);
+        pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override public void onPageSelected(int position) { showTab(position); }
         });
 
-        findViewById(R.id.btnWhats).setOnClickListener(v -> shareWhatsApp());
-        findViewById(R.id.btnExcel).setOnClickListener(v -> exportExcel());
+        /* ---- iOS style bottom tab bar ---- */
+        int[] navIds  = {R.id.navWindows, R.id.navEstimate, R.id.navCutting};
+        int[] iconIds = {R.id.navWindowsIcon, R.id.navEstimateIcon, R.id.navCuttingIcon};
+        int[] textIds = {R.id.navWindowsText, R.id.navEstimateText, R.id.navCuttingText};
+        for (int i = 0; i < 3; i++) {
+            final int page = i;
+            navIcons[i] = findViewById(iconIds[i]);
+            navTexts[i] = findViewById(textIds[i]);
+            findViewById(navIds[i]).setOnClickListener(v -> selectPage(page));
+        }
+        buildDots();
+
+        findViewById(R.id.btnShare).setOnClickListener(v -> showShareSheet());
         findViewById(R.id.btnSettings).setOnClickListener(v -> showSettings());
         findViewById(R.id.btnPrice).setOnClickListener(v -> togglePrice());
         findViewById(R.id.btnPrice).setOnLongClickListener(v -> {
@@ -127,6 +152,95 @@ public class MainActivity extends AppCompatActivity {
 
         recalc();
         showTab(0);
+        handlePageIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handlePageIntent(intent);
+    }
+
+    /** Web Chat / agent can ask for a specific page: 0 windows, 1 estimate, 2 cutting. */
+    private void handlePageIntent(Intent i) {
+        try {
+            if (i == null || !i.hasExtra(EXTRA_PAGE)) return;
+            final int page = Math.max(0, Math.min(2, i.getIntExtra(EXTRA_PAGE, 0)));
+            i.removeExtra(EXTRA_PAGE);
+            pager.post(() -> { items.clear(); loadData(); recalc(); if (adapter != null) adapter.notifyDataSetChanged(); selectPage(page); });
+        } catch (Throwable ignored) { }
+    }
+
+    /* ================= NAVIGATION (pager + bottom bar) ================= */
+    private void selectPage(int i) {
+        if (pager.getCurrentItem() == i) showTab(i);
+        else pager.setCurrentItem(i, true);
+    }
+
+    private void buildDots() {
+        dots.removeAllViews();
+        for (int i = 0; i < 3; i++) {
+            View d = new View(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(6), dp(6));
+            lp.setMargins(dp(3), 0, dp(3), 0);
+            d.setLayoutParams(lp);
+            d.setBackgroundResource(R.drawable.dot_off);
+            dots.addView(d);
+        }
+    }
+
+    private void paintNav(int sel) {
+        int on = ContextCompat.getColor(this, R.color.acc);
+        int off = ContextCompat.getColor(this, R.color.mut);
+        for (int i = 0; i < 3; i++) {
+            boolean s = i == sel;
+            if (navIcons[i] != null) {
+                navIcons[i].setImageTintList(ColorStateList.valueOf(s ? on : off));
+                navIcons[i].setBackgroundResource(s ? R.drawable.bg_nav_pill : 0);
+            }
+            if (navTexts[i] != null) navTexts[i].setTextColor(s ? on : off);
+            View d = dots.getChildAt(i);
+            if (d != null) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) d.getLayoutParams();
+                lp.width = dp(s ? 18 : 6);
+                d.setLayoutParams(lp);
+                d.setBackgroundResource(s ? R.drawable.dot_on : R.drawable.dot_off);
+            }
+        }
+        // AI / More are action buttons — always muted
+        ImageView ai = findViewById(R.id.navAiIcon), more = findViewById(R.id.navMoreIcon);
+        if (ai != null) ai.setImageTintList(ColorStateList.valueOf(off));
+        if (more != null) more.setImageTintList(ColorStateList.valueOf(off));
+        if (tvTitle != null) tvTitle.setText(PAGE_TITLES[sel]);
+    }
+
+    /** Pre-built page views hosted in ViewPager2 (no fragments needed). */
+    private static final class PageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private final View[] pages;
+        PageAdapter(View... pages) { this.pages = pages; }
+        @Override public int getItemViewType(int position) { return position; }
+        @Override public int getItemCount() { return pages.length; }
+        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = pages[viewType];
+            if (v.getParent() instanceof ViewGroup) ((ViewGroup) v.getParent()).removeView(v);
+            v.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            return new RecyclerView.ViewHolder(v) {};
+        }
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {}
+    }
+
+    /* ================= SHARE SHEET ================= */
+    private void showShareSheet() {
+        BottomSheetDialog d = new BottomSheetDialog(this);
+        View v = getLayoutInflater().inflate(R.layout.sheet_share, null);
+        v.findViewById(R.id.btnWhats).setOnClickListener(x -> { d.dismiss(); shareWhatsApp(); });
+        v.findViewById(R.id.btnExcel).setOnClickListener(x -> { d.dismiss(); exportExcel(); });
+        v.findViewById(R.id.btnCutImg).setOnClickListener(x -> { d.dismiss(); shareAllCuttingImages(); });
+        v.findViewById(R.id.btnBom).setOnClickListener(x -> { d.dismiss(); shareBom(); });
+        d.setContentView(v);
+        d.show();
     }
 
     @Override
@@ -158,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
     /* ================= VIEWS ================= */
     private void buildViews() {
         /* ---- TAB 1 : excel jaisa sheet ---- */
-        sheetView = getLayoutInflater().inflate(R.layout.frag_sheet, container, false);
+        sheetView = getLayoutInflater().inflate(R.layout.frag_sheet, pager, false);
         rv = sheetView.findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(this));
         sheetView.findViewById(R.id.btnAddRow).setOnClickListener(v -> addNextRow());
@@ -168,9 +282,8 @@ public class MainActivity extends AppCompatActivity {
         if (fab != null) {
             fab.setOnClickListener(v -> {
                 recalc();
-                // Switch to CUTTING tab to show results
-                TabLayout.Tab t = tabs.getTabAt(2);
-                if (t != null) t.select();
+                // Switch to CUTTING page to show results
+                selectPage(2);
                 toast("⚡ Best Fit optimization applied!");
             });
         }
@@ -179,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged() { recalc(); saveData(); }
             public void onDelete(WindowItem it) { deleteWindow(it); }
             public void onOpen(WindowItem it) { showRowDialog(it); }
-            public void onAutoAddRow() { addNextRow(); }
+            public void onAutoAddRow() { addNextRow(true); }
         });
         rv.setAdapter(adapter);
         int p = dp(10);
@@ -196,15 +309,16 @@ public class MainActivity extends AppCompatActivity {
         boxPlan.setPadding(p, p, p, dp(20));
         scPlan.addView(boxPlan);
 
-        container.addView(sheetView);
-        container.addView(scResult);
-        container.addView(scPlan);
+        scResult.setClipToPadding(false);
+        scPlan.setClipToPadding(false);
+        pager.setAdapter(new PageAdapter(sheetView, scResult, scPlan));
     }
 
+    private int curPage = 0;
+
     private void showTab(int i) {
-        sheetView.setVisibility(i == 0 ? View.VISIBLE : View.GONE);
-        scResult.setVisibility(i == 1 ? View.VISIBLE : View.GONE);
-        scPlan.setVisibility(i == 2 ? View.VISIBLE : View.GONE);
+        curPage = i;
+        paintNav(i);
         if (i == 1) renderEstimate();
         if (i == 2) renderPlan();
     }
@@ -223,13 +337,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addNextRow() {
+        addNextRow(false);
+    }
+
+    /**
+     * @param quiet true when this row appears automatically while the user is
+     *              still typing in the previous one. Then we only announce the
+     *              insertion — a full rebind would move the caret to position 0
+     *              and typing "2" then "5" would produce "52".
+     */
+    private void addNextRow(boolean quiet) {
         int sutter = 2, sys = WindowItem.ZED;
         if (!items.isEmpty()) {
             WindowItem last = items.get(items.size() - 1);
             sutter = last.sutter;
             sys = last.system;
         }
-        addWindow(0, 0, sutter, 1, sys);
+        if (quiet && adapter != null) {
+            seq++;
+            items.add(new WindowItem(seq, "W" + seq, sys, 0, 0, sutter, 1));
+            adapter.notifyItemAppended();
+            int last = items.size() - 1;
+            if (!rowVisible(last)) rv.scrollToPosition(last);
+            recalc(); saveData();
+        } else {
+            addWindow(0, 0, sutter, 1, sys);
+        }
+    }
+
+    /** Scroll only when the row is off-screen, so typing never jumps the sheet. */
+    private boolean rowVisible(int pos) {
+        RecyclerView.LayoutManager lm = rv == null ? null : rv.getLayoutManager();
+        if (!(lm instanceof LinearLayoutManager)) return false;
+        LinearLayoutManager llm = (LinearLayoutManager) lm;
+        return pos >= llm.findFirstVisibleItemPosition() && pos <= llm.findLastVisibleItemPosition();
     }
 
     /** row tap -> full detail dialog */
@@ -375,8 +516,8 @@ public class MainActivity extends AppCompatActivity {
         cost = Costing.all(res, pb, st);
         tvSub.setText(grand.windows + " windows  \u2022  " + grand.pcs + " pcs  \u2022  "
                 + grand.stockPipes + " pipes");
-        if (scResult.getVisibility() == View.VISIBLE) renderEstimate();
-        if (scPlan.getVisibility() == View.VISIBLE) renderPlan();
+        if (curPage == 1) renderEstimate();
+        if (curPage == 2) renderPlan();
     }
 
     private void saveData() {
@@ -413,7 +554,7 @@ public class MainActivity extends AppCompatActivity {
         g.body.addView(kv("Total pieces", String.valueOf(grand.pcs)));
         g.body.addView(kv("Total material", st.fmtU(grand.totalLen)));
         g.body.addView(kv("Stock pipe length", st.fmtU(st.stock)));
-        g.body.addView(bigKv("STOCK PIPE REQUIRED", grand.stockPipes + " pcs", 0xFF16A34A));
+        g.body.addView(bigKv("STOCK PIPE REQUIRED", grand.stockPipes + " pcs", com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok)));
         if (grand.zedPipes > 0 && grand.domalPipes > 0)
             g.body.addView(kv("   ZED / DOMAL", grand.zedPipes + " / " + grand.domalPipes));
         g.body.addView(kv("Waste", st.fmtU(grand.waste) + "  ("
@@ -447,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
                 pc.body.addView(kv("ZED total", Costing.rs(cost.zedAmt)));
                 pc.body.addView(kv("DOMAL total", Costing.rs(cost.domalAmt)));
             }
-            pc.body.addView(bigKv("GRAND TOTAL", Costing.rs(cost.total), 0xFF15803D));
+            pc.body.addView(bigKv("GRAND TOTAL", Costing.rs(cost.total), com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok)));
             boxResult.addView(pc.outer);
         }
 
@@ -457,9 +598,9 @@ public class MainActivity extends AppCompatActivity {
                 Engine.filterSystem(sum, WindowItem.DOMAL);
 
         if (!zed.isEmpty()) boxResult.addView(pipeCard("ZED  —  PIPE REQUIREMENT", zed,
-                grand.zedPipes, 0xFF2563EB));
+                grand.zedPipes, com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.acc)));
         if (!dom.isEmpty()) boxResult.addView(pipeCard("DOMAL  —  PIPE REQUIREMENT", dom,
-                grand.domalPipes, 0xFF0EA5E9));
+                grand.domalPipes, com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.cFrame)));
 
         for (Engine.WinResult r : res) {
             if (r.empty) continue;
@@ -473,24 +614,24 @@ public class MainActivity extends AppCompatActivity {
                 continue;
             }
             c.body.addView(kvBold("SUTTER", st.fmt(r.sutterH) + "  x  " + st.fmt(r.sutterW),
-                    r.system == WindowItem.DOMAL ? 0xFF14B8A6 : 0xFF22C55E));
+                    r.system == WindowItem.DOMAL ? com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.cSutter) : com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok)));
             if (r.muliyaQ > 0)
                 c.body.addView(kvBold(r.muliyaLabel(), st.fmt(r.muliyaH) + "   x" + r.muliyaQ + " pcs",
-                        r.system == WindowItem.DOMAL ? 0xFFF59E0B : 0xFF8B5CF6));
+                        com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.cMuliya)));
             if (r.rpQty > 0)
                 c.body.addView(kvBold("RP GRILL", r.rpQty + " pcs @ " + st.fmt(r.rpSpace)
                         + "  |  len " + st.fmt(r.rpLen)
                         + (r.rpAuto ? "   (auto)" : "   (manual)"),
-                        r.system == WindowItem.DOMAL ? 0xFFF43F5E : 0xFFEC4899));
+                        com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.cRp)));
             c.body.addView(kvBold("GLASS", st.fmt(r.glassH) + "  x  " + st.fmt(r.glassW)
                     + "   (" + String.format(Locale.US, "%.2f", r.glassSqft() * r.glassQty())
-                    + " sq.ft)", 0xFF0891B2));
+                    + " sq.ft)", com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.cFrame)));
 
             if (showPrice) {
                 Costing.WinCost wc = Costing.window(r, pb, st);
                 if (wc.total > 0)
                     c.body.addView(bigKv("PRICE  (" + String.format(Locale.US, "%.2f", wc.weight)
-                            + " kg)", Costing.rs(wc.total), 0xFF15803D));
+                            + " kg)", Costing.rs(wc.total), com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok)));
             }
 
             c.body.addView(divider());
@@ -562,7 +703,7 @@ public class MainActivity extends AppCompatActivity {
         btnManual.setText("✂  OPEN MANUAL PCO & SHEET CUTTING");
         btnManual.setTextSize(12.5f);
         btnManual.setTypeface(null, Typeface.BOLD);
-        btnManual.setTextColor(0xFF16A34A);
+        btnManual.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok));
         btnManual.setGravity(Gravity.CENTER);
         btnManual.setPadding(0, dp(9), 0, dp(4));
         btnManual.setOnClickListener(v -> startActivity(new Intent(this, ManualCuttingActivity.class)));
@@ -573,12 +714,15 @@ public class MainActivity extends AppCompatActivity {
         btnShareAll.setText("\uD83D\uDCF7  SHARE ALL CUTTING IMAGES");
         btnShareAll.setTextSize(13);
         btnShareAll.setTypeface(null, Typeface.BOLD);
-        btnShareAll.setTextColor(0xFF2563EB);
+        btnShareAll.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.acc));
         btnShareAll.setGravity(Gravity.CENTER);
         btnShareAll.setPadding(0, dp(10), 0, dp(4));
         btnShareAll.setOnClickListener(v -> shareAllCuttingImages());
         headerCard.body.addView(btnShareAll);
         boxPlan.addView(headerCard.outer);
+
+        // Editable stock pipes — har section ka apna stock length + bache hue pipe
+        boxPlan.addView(stockPipesCard());
 
         for (Engine.TypeSummary ts : sum.values()) {
             if (ts.bins == null || ts.bins.isEmpty()) continue;
@@ -586,7 +730,7 @@ public class MainActivity extends AppCompatActivity {
             Card c = card(Engine.nameOf(ts.type) + "   \u2014   "
                     + ts.stockNeeded() + " pipes");
             c.body.addView(smallNote(ts.pcs + " pcs  \u2022  need " + st.fmtU(ts.totalLen)
-                    + "  \u2022  waste " + st.fmtU(ts.waste(st.stock))));
+                    + "  \u2022  waste " + st.fmtU(ts.waste())));
 
             // Share individual cutting image button
             final Engine.TypeSummary thisType = ts;
@@ -596,20 +740,22 @@ public class MainActivity extends AppCompatActivity {
             btnShare.setText("\uD83D\uDDBC  Share " + Engine.shortName(ts.type) + " image");
             btnShare.setTextSize(11);
             btnShare.setTypeface(null, Typeface.BOLD);
-            btnShare.setTextColor(0xFF7C3AED);
+            btnShare.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.acc));
             btnShare.setPadding(0, dp(6), 0, dp(2));
             btnShare.setOnClickListener(v -> shareCuttingImage(thisTypeKey, thisType));
             c.body.addView(btnShare);
 
             for (int i = 0; i < ts.bins.size(); i++) {
                 Engine.Bin b = ts.bins.get(i);
+                double barLen = b.length(st.stock);
 
                 TextView lab = new TextView(this);
-                lab.setText("Pipe #" + (i + 1) + "   used " + st.fmt(b.used)
-                        + " / " + st.fmt(st.stock)
-                        + "   \u2022   left " + st.fmt(Math.max(0, b.free(st.stock))));
+                lab.setText("Pipe #" + (i + 1) + "   " + st.fmt(barLen) + st.unit()
+                        + (b.over ? "  (OVERSIZE)" : (Math.abs(barLen - st.primaryStockFor(ts.type)) > 0.01 ? "  (extra)" : ""))
+                        + "   used " + st.fmt(b.used)
+                        + "   \u2022   left " + st.fmt(Math.max(0, barLen - b.used)));
                 lab.setTextSize(10.5f);
-                lab.setTextColor(0xFF66758C);
+                lab.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
                 LinearLayout.LayoutParams lp0 = new LinearLayout.LayoutParams(-1, -2);
                 lp0.topMargin = dp(9);
                 lp0.bottomMargin = dp(3);
@@ -617,12 +763,297 @@ public class MainActivity extends AppCompatActivity {
                 c.body.addView(lab);
 
                 PipeBarView bar = new PipeBarView(this);
-                bar.setData(b, st.stock, col, st);
+                bar.setData(b, barLen, col, st);
                 bar.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
                 c.body.addView(bar);
             }
             boxPlan.addView(c.outer);
         }
+    }
+
+    /* ================= SECTION-WISE STOCK PIPES (EDITABLE) ================= */
+
+    /** Card in the cutting plan listing the stock length of every section. */
+    private View stockPipesCard() {
+        Card c = card("STOCK PIPES   \u2014   tap to edit");
+
+        LinkedHashSet<String> types = new LinkedHashSet<>();
+        if (sum != null) types.addAll(sum.keySet());
+        types.addAll(st.stockBars.keySet());
+
+        if (types.isEmpty()) {
+            c.body.addView(smallNote("Add a window first, then set the pipe size of each section."));
+        }
+
+        int i = 0;
+        for (final String type : types) {
+            StringBuilder v = new StringBuilder();
+            v.append(st.fmt(st.primaryStockFor(type))).append(st.unit());
+            List<Engine.StockBar> extras = st.extrasFor(type);
+            if (!extras.isEmpty()) {
+                v.append("   +");
+                for (int k = 0; k < extras.size(); k++) {
+                    if (k > 0) v.append(", ");
+                    v.append(st.fmt(extras.get(k).len)).append(" x").append(extras.get(k).qty);
+                }
+            }
+            c.body.addView(stockRow(Engine.nameOf(type), Engine.colorOf(type), v.toString(),
+                    new View.OnClickListener() {
+                        @Override public void onClick(View x) { showStockBarsDialog(type); }
+                    }));
+            if (++i < types.size()) c.body.addView(divider());
+        }
+
+        TextView add = new TextView(this);
+        add.setText("+  ADD ANOTHER PIPE / LEFTOVER");
+        add.setTextSize(12.5f);
+        add.setTypeface(null, Typeface.BOLD);
+        add.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok));
+        add.setGravity(Gravity.CENTER);
+        add.setPadding(0, dp(10), 0, dp(2));
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { showAddStockDialog(); }
+        });
+        c.body.addView(add);
+        c.body.addView(smallNote("Frame, sutter, muliya \u2014 sabka stock pipe alag ho sakta hai. "
+                + "Bacha hua pipe add karein to plan usse pehle use karega (kam waste)."));
+        return c.outer;
+    }
+
+    private View stockRow(String name, int col, String value, View.OnClickListener click) {
+        LinearLayout l = new LinearLayout(this);
+        l.setOrientation(LinearLayout.HORIZONTAL);
+        l.setGravity(Gravity.CENTER_VERTICAL);
+        l.setPadding(0, dp(7), 0, dp(7));
+
+        TextView a = new TextView(this);
+        a.setText(name);
+        a.setTextSize(12f);
+        a.setTypeface(null, Typeface.BOLD);
+        a.setTextColor(col);
+        a.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+
+        TextView b = new TextView(this);
+        b.setText(value);
+        b.setTextSize(12.5f);
+        b.setTypeface(null, Typeface.BOLD);
+        b.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt));
+
+        TextView e = new TextView(this);
+        e.setText("  \u270F");
+        e.setTextSize(15f);
+        e.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.acc));
+
+        l.addView(a);
+        l.addView(b);
+        l.addView(e);
+        l.setOnClickListener(click);
+        return l;
+    }
+
+    /** Edit one section: main stock length + leftover pipes. */
+    private void showStockBarsDialog(final String type) {
+        // work on a copy; commit only on SAVE
+        final List<Engine.StockBar> work = st.barsFor(type);
+
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(16), dp(6), dp(16), 0);
+
+        box.addView(dlgLabel("MAIN STOCK PIPE  (" + st.unit() + ")"));
+        final EditText mainLen = numEdit(String.valueOf(st.primaryStockFor(type)));
+        box.addView(mainLen);
+
+        box.addView(dlgLabel("BACHA HUA / EXTRA PIPE"));
+        final LinearLayout extras = new LinearLayout(this);
+        extras.setOrientation(LinearLayout.VERTICAL);
+        box.addView(extras);
+
+        final Runnable[] paint = new Runnable[1];
+        paint[0] = new Runnable() {
+            @Override public void run() {
+                extras.removeAllViews();
+                boolean any = false;
+                for (final Engine.StockBar bar : work) {
+                    if (bar.unlimited()) continue;
+                    any = true;
+                    LinearLayout row = new LinearLayout(MainActivity.this);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
+                    row.setGravity(Gravity.CENTER_VERTICAL);
+                    row.setPadding(0, dp(3), 0, dp(3));
+                    TextView t = new TextView(MainActivity.this);
+                    t.setText(st.fmt(bar.len) + st.unit() + "   \u00d7 " + bar.qty + " pcs");
+                    t.setTextSize(13f);
+                    t.setTypeface(null, Typeface.BOLD);
+                    t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt));
+                    t.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+                    TextView del = new TextView(MainActivity.this);
+                    del.setText("REMOVE");
+                    del.setTextSize(11f);
+                    del.setTypeface(null, Typeface.BOLD);
+                    del.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.red));
+                    del.setPadding(dp(8), dp(4), 0, dp(4));
+                    del.setOnClickListener(new View.OnClickListener() {
+                        @Override public void onClick(View v) { work.remove(bar); paint[0].run(); }
+                    });
+                    row.addView(t);
+                    row.addView(del);
+                    extras.addView(row);
+                }
+                if (!any) extras.addView(dlgNote("Koi extra pipe nahi \u2014 neeche se add karein."));
+            }
+        };
+        paint[0].run();
+
+        LinearLayout addRow = new LinearLayout(this);
+        addRow.setOrientation(LinearLayout.HORIZONTAL);
+        addRow.setGravity(Gravity.CENTER_VERTICAL);
+        final EditText eLen = numEdit("");
+        eLen.setHint("length");
+        eLen.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+        final EditText eQty = numEdit("");
+        eQty.setHint("qty");
+        eQty.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 0.7f));
+        TextView addBtn = new TextView(this);
+        addBtn.setText("  ADD  ");
+        addBtn.setTextSize(12f);
+        addBtn.setTypeface(null, Typeface.BOLD);
+        addBtn.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok));
+        addBtn.setPadding(dp(6), dp(6), dp(6), dp(6));
+        addBtn.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                double len = d(eLen, 0);
+                int qty = (int) Math.max(1, Math.round(d(eQty, 1)));
+                if (len <= 0) { toast("Length daalein"); return; }
+                work.add(new Engine.StockBar(len, qty));
+                eLen.setText("");
+                eQty.setText("");
+                paint[0].run();
+            }
+        });
+        addRow.addView(eLen);
+        addRow.addView(eQty);
+        addRow.addView(addBtn);
+        box.addView(addRow);
+
+        new AlertDialog.Builder(this)
+                .setTitle(Engine.nameOf(type))
+                .setView(box)
+                .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) {
+                        double len = d(mainLen, st.primaryStockFor(type));
+                        if (len > 0) {
+                            boolean set = false;
+                            for (Engine.StockBar b : work) {
+                                if (b.unlimited()) { b.len = len; set = true; break; }
+                            }
+                            if (!set) work.add(0, new Engine.StockBar(len, -1));
+                        }
+                        List<Engine.StockBar> clean = new ArrayList<>();
+                        for (Engine.StockBar b : work) if (b.len > 0) clean.add(b);
+                        if (clean.isEmpty()) st.stockBars.remove(type);
+                        else st.stockBars.put(type, clean);
+                        applyStockChanges();
+                    }
+                })
+                .setNeutralButton("RESET", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) {
+                        st.stockBars.remove(type);
+                        applyStockChanges();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    /** Add a leftover / another pipe size to any section. */
+    private void showAddStockDialog() {
+        final List<String> types = Engine.getTypes();
+        final String[] names = new String[types.size()];
+        for (int i = 0; i < types.size(); i++) names[i] = Engine.nameOf(types.get(i));
+
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(16), dp(6), dp(16), 0);
+
+        box.addView(dlgLabel("SECTION"));
+        final android.widget.Spinner sp = new android.widget.Spinner(this);
+        android.widget.ArrayAdapter<String> sa = new android.widget.ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, names);
+        sa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(sa);
+        box.addView(sp);
+
+        box.addView(dlgLabel("PIPE LENGTH  (" + st.unit() + ")"));
+        final EditText eLen = numEdit("");
+        box.addView(eLen);
+
+        box.addView(dlgLabel("KITNE PIPE HAIN  (qty)"));
+        final EditText eQty = numEdit("1");
+        box.addView(eQty);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add pipe / leftover")
+                .setView(box)
+                .setPositiveButton("ADD AS EXTRA", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) {
+                        double len = d(eLen, 0);
+                        int qty = (int) Math.max(1, Math.round(d(eQty, 1)));
+                        if (len <= 0) { toast("Length daalein"); return; }
+                        String type = types.get(Math.max(0, sp.getSelectedItemPosition()));
+                        st.addExtraBar(type, len, qty);
+                        applyStockChanges();
+                        toast(Engine.nameOf(type) + " \u2014 " + st.fmt(len) + st.unit() + " x" + qty + " added");
+                    }
+                })
+                .setNeutralButton("SET AS MAIN", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) {
+                        double len = d(eLen, 0);
+                        if (len <= 0) { toast("Length daalein"); return; }
+                        String type = types.get(Math.max(0, sp.getSelectedItemPosition()));
+                        st.setPrimaryStock(type, len);
+                        applyStockChanges();
+                        toast(Engine.nameOf(type) + " main stock = " + st.fmt(len) + st.unit());
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void applyStockChanges() {
+        st.save(this);
+        recalc();
+        if (scPlan.getVisibility() == View.VISIBLE) renderPlan();
+        if (scResult.getVisibility() == View.VISIBLE) renderEstimate();
+    }
+
+    private View dlgLabel(String s) {
+        TextView t = new TextView(this);
+        t.setText(s);
+        t.setTextSize(10.5f);
+        t.setTypeface(null, Typeface.BOLD);
+        t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
+        t.setPadding(0, dp(8), 0, dp(2));
+        return t;
+    }
+
+    private View dlgNote(String s) {
+        TextView t = new TextView(this);
+        t.setText(s);
+        t.setTextSize(11.5f);
+        t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
+        t.setPadding(0, dp(4), 0, dp(4));
+        return t;
+    }
+
+    private EditText numEdit(String value) {
+        EditText e = new EditText(this);
+        e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
+                | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        e.setText(value);
+        e.setSelectAllOnFocus(true);
+        e.setSingleLine(true);
+        return e;
     }
 
     /* ================= CUTTING IMAGE SHARE ================= */
@@ -673,10 +1104,7 @@ public class MainActivity extends AppCompatActivity {
         pb = PriceBook.load(this);
         toast(showPrice ? "Prices ON" : "Prices hidden");
         recalc();
-        if (showPrice && tabs.getSelectedTabPosition() == 0) {
-            TabLayout.Tab t = tabs.getTabAt(1);
-            if (t != null) t.select();
-        }
+        if (showPrice && curPage == 0) selectPage(1);
     }
 
     /* ================= CUSTOMER ================= */
@@ -729,6 +1157,17 @@ public class MainActivity extends AppCompatActivity {
         Exporter.shareWhatsApp(this, txt);
     }
 
+    /** v1.0 — supplier order list (BOM): quantities only, no prices. */
+    private void shareBom() {
+        if (items.isEmpty()) { toast("Add a window first"); return; }
+        com.digitalalu.alu.calc.BomBuilder.Bom bom =
+                com.digitalalu.alu.calc.BomBuilder.build(res, sum, st);
+        if (bom.totalPipes <= 0) { toast("Pehle window ke size bharo"); return; }
+        bom.bizName = st != null ? st.bizName : "";
+        String txt = new com.digitalalu.alu.calc.BomBuilder().toText(bom, true);
+        Exporter.shareWhatsApp(this, txt);
+    }
+
     private void exportExcel() {
         if (items.isEmpty()) { toast("Add a window first"); return; }
         try {
@@ -748,37 +1187,68 @@ public class MainActivity extends AppCompatActivity {
 
     /* ================= MENU ================= */
     private void showMenu(View anchor) {
-        PopupMenu m = new PopupMenu(this, anchor);
-        m.getMenu().add("\uD83E\uDD16 AI Agent (Chat)");
-        m.getMenu().add("\uD83D\uDC64 My Profile");
-        m.getMenu().add("Save to customer");
-        m.getMenu().add("Customer records");
-        m.getMenu().add("Price system");
-        m.getMenu().add("Manual PCO & Sheet Cutting");
-        m.getMenu().add("Share cutting images");
-        m.getMenu().add("Backup data");
-        m.getMenu().add("Restore data");
-        m.getMenu().add("Clear all");
-        m.getMenu().add("Formula");
-        m.getMenu().add("About");
-        m.setOnMenuItemClickListener(mi -> {
-            String t = mi.getTitle().toString();
-            if (t.contains("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
-            else if (t.contains("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
-            else if (t.startsWith("Save to")) saveToCustomer();
-            else if (t.startsWith("Customer")) startActivityForResult(
-                    new Intent(this, CustomerActivity.class), REQ_CUSTOMER);
-            else if (t.startsWith("Price")) startActivity(new Intent(this, PriceActivity.class));
-            else if (t.startsWith("Manual PCO")) startActivity(new Intent(this, ManualCuttingActivity.class));
-            else if (t.startsWith("Share cutting")) shareAllCuttingImages();
-            else if (t.startsWith("Backup")) backupData();
-            else if (t.startsWith("Restore")) restoreData();
-            else if (t.startsWith("Clear")) confirmClear();
-            else if (t.startsWith("Formula")) showFormula();
-            else showAbout();
-            return true;
-        });
-        m.show();
+        final BottomSheetDialog d = new BottomSheetDialog(this);
+        ScrollView sc = new ScrollView(this);
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setBackgroundResource(R.drawable.bg_sheet);
+        box.setPadding(dp(20), dp(10), dp(20), dp(24));
+        sc.addView(box);
+
+        View handle = new View(this);
+        LinearLayout.LayoutParams hl = new LinearLayout.LayoutParams(dp(40), dp(4));
+        hl.gravity = Gravity.CENTER_HORIZONTAL;
+        handle.setLayoutParams(hl);
+        handle.setBackgroundResource(R.drawable.bg_sheet_handle);
+        box.addView(handle);
+
+        TextView title = new TextView(this);
+        title.setText("More");
+        title.setTextSize(20);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTextColor(ContextCompat.getColor(this, R.color.txt));
+        title.setPadding(0, dp(14), 0, dp(12));
+        box.addView(title);
+
+        String[][] rows = {
+                {"\uD83E\uDD16", "AI Agent (Chat)", "Hinglish me baat karke window add karein"},
+                {"\uD83D\uDC64", "My Profile", "Business name, address, mobile"},
+                {"\uD83D\uDCBE", "Save to customer", "Current estimate ko customer me save karein"},
+                {"\uD83D\uDCC7", "Customer records", "Saved estimates (PIN)"},
+                {"\u20B9", "Price system", "Rates & kg per 16 ft (PIN to edit)"},
+                {"\uD83D\uDCCF", "Manual PCO & Sheet Cutting", "Standalone pipe / sheet optimizer"},
+                {"\u2211", "Formula", "Custom system formulas"},
+                {"\u2601\uFE0F", "Backup data", "Sab kuch ek JSON file me"},
+                {"\u267B\uFE0F", "Restore data", "Backup file se wapas laayein"},
+                {"\uD83D\uDDD1\uFE0F", "Clear all", "Saari windows hata dein"},
+                {"\u2139\uFE0F", "About", "Version & info"},
+        };
+        for (String[] r : rows) {
+            View row = getLayoutInflater().inflate(R.layout.sheet_menu_row, box, false);
+            ((TextView) row.findViewById(R.id.rowIcon)).setText(r[0]);
+            ((TextView) row.findViewById(R.id.rowTitle)).setText(r[1]);
+            ((TextView) row.findViewById(R.id.rowSub)).setText(r[2]);
+            final String t = r[1];
+            row.setOnClickListener(v -> { d.dismiss(); onMenuAction(t); });
+            box.addView(row);
+        }
+        d.setContentView(sc);
+        d.show();
+    }
+
+    private void onMenuAction(String t) {
+        if (t.contains("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
+        else if (t.contains("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
+        else if (t.startsWith("Save to")) saveToCustomer();
+        else if (t.startsWith("Customer")) startActivityForResult(
+                new Intent(this, CustomerActivity.class), REQ_CUSTOMER);
+        else if (t.startsWith("Price")) startActivity(new Intent(this, PriceActivity.class));
+        else if (t.startsWith("Manual PCO")) startActivity(new Intent(this, ManualCuttingActivity.class));
+        else if (t.startsWith("Backup")) backupData();
+        else if (t.startsWith("Restore")) restoreData();
+        else if (t.startsWith("Clear")) confirmClear();
+        else if (t.startsWith("Formula")) showFormula();
+        else showAbout();
     }
 
     /* ================= BACKUP / RESTORE ================= */
@@ -1060,18 +1530,20 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout outer = new LinearLayout(this);
         outer.setOrientation(LinearLayout.VERTICAL);
         outer.setBackgroundResource(R.drawable.bg_card);
-        outer.setPadding(dp(14), dp(13), dp(14), dp(13));
+        // One UI: 18dp card padding, 12dp gap between cards
+        outer.setPadding(dp(18), dp(16), dp(18), dp(16));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-        lp.bottomMargin = dp(10);
+        lp.bottomMargin = dp(12);
         outer.setLayoutParams(lp);
 
         TextView t = new TextView(this);
         t.setText(title);
-        t.setTextSize(12f);
+        // One UI card title: 14.5sp bold ink (pehle 12sp accent kicker tha)
+        t.setTextSize(14.5f);
         t.setTypeface(null, Typeface.BOLD);
-        t.setTextColor(0xFF2563EB);
-        t.setLetterSpacing(0.05f);
-        t.setPadding(0, 0, 0, dp(8));
+        t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt));
+        t.setLetterSpacing(-0.01f);
+        t.setPadding(0, 0, 0, dp(12));
         outer.addView(t);
 
         LinearLayout body = new LinearLayout(this);
@@ -1086,11 +1558,11 @@ public class MainActivity extends AppCompatActivity {
         l.setOrientation(LinearLayout.HORIZONTAL);
         l.setPadding(0, dp(4), 0, dp(4));
         TextView a = new TextView(this);
-        a.setText(k); a.setTextSize(12.5f); a.setTextColor(0xFF66758C);
+        a.setText(k); a.setTextSize(12.5f); a.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
         a.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
         TextView b = new TextView(this);
         b.setText(v); b.setTextSize(13f); b.setTypeface(null, Typeface.BOLD);
-        b.setTextColor(0xFF152236);
+        b.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt));
         l.addView(a); l.addView(b);
         return l;
     }
@@ -1106,7 +1578,7 @@ public class MainActivity extends AppCompatActivity {
         l.setLayoutParams(lp);
         TextView a = new TextView(this);
         a.setText(k); a.setTextSize(11f); a.setTypeface(null, Typeface.BOLD);
-        a.setTextColor(0xFF15803D);
+        a.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.ok));
         a.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
         TextView b = new TextView(this);
         b.setText(v); b.setTextSize(19f); b.setTypeface(null, Typeface.BOLD);
@@ -1128,20 +1600,20 @@ public class MainActivity extends AppCompatActivity {
         a.setPadding(dp(8), dp(3), dp(8), dp(3));
         TextView b = new TextView(this);
         b.setText("  " + v); b.setTextSize(13.5f); b.setTypeface(null, Typeface.BOLD);
-        b.setTextColor(0xFF152236);
+        b.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt));
         l.addView(a); l.addView(b);
         return l;
     }
 
     private View rowHead(String a, String b, String c, String d) {
-        return row(a, b, c, d, 0xFF94A3B8, 10f, true, 0);
+        return row(a, b, c, d, com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut), 10f, true, 0);
     }
     private View rowHead2(String a, String b, String c, String d) {
-        return row(a, b, c, d, 0xFFEA580C, 12.5f, true, 0);
+        return row(a, b, c, d, com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.warn), 12.5f, true, 0);
     }
 
     private View rowType(String name, int col, String b, String c, String d) {
-        LinearLayout l = (LinearLayout) row(name, b, c, d, 0xFF152236, 12f, false, col);
+        LinearLayout l = (LinearLayout) row(name, b, c, d, com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.txt), 12f, false, col);
         return l;
     }
 
@@ -1188,20 +1660,20 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(1));
         lp.topMargin = dp(7); lp.bottomMargin = dp(7);
         v.setLayoutParams(lp);
-        v.setBackgroundColor(0xFFEEF2F8);
+        v.setBackgroundColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.line));
         return v;
     }
 
     private View smallNote(String s) {
         TextView t = new TextView(this);
-        t.setText(s); t.setTextSize(11f); t.setTextColor(0xFF66758C);
+        t.setText(s); t.setTextSize(11f); t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
         t.setPadding(0, dp(2), 0, dp(4));
         return t;
     }
 
     private View hint(String s) {
         TextView t = new TextView(this);
-        t.setText(s); t.setTextSize(13f); t.setTextColor(0xFF94A3B8);
+        t.setText(s); t.setTextSize(13f); t.setTextColor(com.digitalalu.alu.ui.V2.col(MainActivity.this, com.digitalalu.alu.R.color.mut));
         t.setPadding(dp(6), dp(20), dp(6), dp(20));
         t.setGravity(Gravity.CENTER);
         return t;

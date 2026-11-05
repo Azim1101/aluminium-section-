@@ -1,61 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI row editor -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/card">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="22dp" android:paddingEnd="22dp"
+        android:paddingTop="18dp" android:paddingBottom="24dp">
 
-        <TextView style="@style/SecHead" android:text="SIZE"/>
+        <TextView style="@style/SecHead" android:text="Size"
+            android:textAllCaps="false" android:layout_marginTop="4dp"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="HEIGHT"/>
+                <TextView style="@style/FieldLabel" android:text="HEIGHT" android:labelFor="@+id/dH"/>
                 <EditText android:id="@+id/dH" style="@style/FieldInput"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="WIDTH"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="WIDTH" android:labelFor="@+id/dW"/>
                 <EditText android:id="@+id/dW" style="@style/FieldInput"/>
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:baselineAligned="false"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="12dp">
             <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="SUTTER QTY"/>
+                <TextView style="@style/FieldLabel" android:text="SUTTER QTY" android:labelFor="@+id/dSutter"/>
                 <Spinner android:id="@+id/dSutter" android:layout_width="match_parent"
-                    android:layout_height="42dp" android:background="@drawable/bg_input"/>
+                    android:layout_height="@dimen/ou_field_h"
+                    android:background="@drawable/bg_input"/>
             </LinearLayout>
-            <LinearLayout style="@style/FieldBox">
-                <TextView style="@style/FieldLabel" android:text="NOS"/>
+            <LinearLayout style="@style/FieldBox" android:layout_marginEnd="0dp">
+                <TextView style="@style/FieldLabel" android:text="NOS" android:labelFor="@+id/dNos"/>
                 <EditText android:id="@+id/dNos" style="@style/FieldInput"
                     android:inputType="number"/>
             </LinearLayout>
         </LinearLayout>
 
-        <TextView style="@style/SecHead" android:text="NAME"/>
+        <TextView style="@style/SecHead" android:text="Name" android:textAllCaps="false"
+            android:labelFor="@+id/dName"/>
         <EditText android:id="@+id/dName"
-            android:layout_width="match_parent" android:layout_height="42dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/ou_field_h"
             android:background="@drawable/bg_input" android:inputType="text"
-            android:textSize="14sp" android:padding="8dp" android:maxLines="1"/>
+            android:textColor="@color/txt" android:textColorHint="@color/hint"
+            android:textSize="15sp" android:paddingStart="14dp" android:paddingEnd="14dp"
+            android:gravity="center_vertical" android:maxLines="1"/>
 
-        <TextView style="@style/SecHead" android:text="RP GRILL"/>
+        <TextView style="@style/SecHead" android:text="RP grill" android:textAllCaps="false"/>
         <Spinner android:id="@+id/dRp"
-            android:layout_width="match_parent" android:layout_height="42dp"
+            android:layout_width="match_parent" android:layout_height="@dimen/ou_field_h"
             android:background="@drawable/bg_input"/>
 
         <TextView
             android:id="@+id/dResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="12dp"
-            android:background="@drawable/bg_stat"
+            android:layout_marginTop="20dp"
+            android:padding="16dp"
+            android:background="@drawable/bg_card2"
             android:textSize="13sp"
             android:textColor="@color/txt"
             android:lineSpacingExtra="4dp"

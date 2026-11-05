@@ -3,6 +3,14 @@ package com.digitalalu.alu.calc;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.digitalalu.alu.model.WindowItem;
 
 /** All deduction values + stock settings (everything in INCH) + business info */
@@ -38,7 +46,124 @@ public class Settings {
     public String bizAddress = "";
     public String bizMobile = "";
 
+    /* ---------------- SECTION-WISE STOCK PIPES ----------------
+     * Key = Engine type ("Z_FRAME", "Z_SUTTER", ...). Each section has its own
+     * standard stock length (unlimited) plus any leftover pieces (limited qty)
+     * the workshop is holding. Empty = fall back to the global `stock` length.
+     */
+    public final Map<String, List<Engine.StockBar>> stockBars = new LinkedHashMap<>();
+
     private static final String P = "alu_settings";
+    private static final String K_BARS = "stock_bars_json";
+
+    /** Available pipes for one section — never empty. */
+    public List<Engine.StockBar> barsFor(String type) {
+        List<Engine.StockBar> src = type == null ? null : stockBars.get(type);
+        List<Engine.StockBar> out = new ArrayList<>();
+        if (src != null) for (Engine.StockBar b : src) if (b != null && b.len > 0) out.add(b.copy());
+        if (out.isEmpty()) out.add(new Engine.StockBar(stock, -1));
+        return out;
+    }
+
+    /** The standard (unlimited) stock length for a section. */
+    public double primaryStockFor(String type) {
+        List<Engine.StockBar> src = type == null ? null : stockBars.get(type);
+        if (src != null) {
+            for (Engine.StockBar b : src) if (b != null && b.unlimited()) return b.len;
+            for (Engine.StockBar b : src) if (b != null) return b.len;
+        }
+        return stock;
+    }
+
+    public boolean hasCustomStock(String type) {
+        return type != null && stockBars.containsKey(type) && !stockBars.get(type).isEmpty();
+    }
+
+    /** Extra (leftover / limited-qty) pipes of a section. */
+    public List<Engine.StockBar> extrasFor(String type) {
+        List<Engine.StockBar> out = new ArrayList<>();
+        List<Engine.StockBar> src = type == null ? null : stockBars.get(type);
+        if (src != null) for (Engine.StockBar b : src) if (b != null && !b.unlimited()) out.add(b);
+        return out;
+    }
+
+    public void setPrimaryStock(String type, double len) {
+        if (type == null || len <= 0) return;
+        for (Engine.StockBar b : edit(type)) {
+            if (b.unlimited()) { b.len = len; return; }
+        }
+        edit(type).add(0, new Engine.StockBar(len, -1));
+    }
+
+    public void addExtraBar(String type, double len, int qty) {
+        if (type == null || len <= 0) return;
+        edit(type).add(new Engine.StockBar(len, Math.max(1, qty)));
+    }
+
+    public void removeExtraBar(String type, Engine.StockBar bar) {
+        List<Engine.StockBar> src = type == null ? null : stockBars.get(type);
+        if (src == null) return;
+        src.remove(bar);
+        if (src.isEmpty()) stockBars.remove(type);
+    }
+
+    /** Forget every per-section override (back to one global stock length). */
+    public void resetStockBars() { stockBars.clear(); }
+
+    private List<Engine.StockBar> edit(String type) {
+        List<Engine.StockBar> l = stockBars.get(type);
+        if (l == null) {
+            l = new ArrayList<>();
+            stockBars.put(type, l);
+        }
+        return l;
+    }
+
+    /* ---- persistence of the section pipe list ---- */
+    private String stockBarsJson() {
+        try {
+            JSONArray arr = new JSONArray();
+            for (Map.Entry<String, List<Engine.StockBar>> e : stockBars.entrySet()) {
+                JSONArray bars = new JSONArray();
+                for (Engine.StockBar b : e.getValue()) {
+                    JSONObject o = new JSONObject();
+                    o.put("len", b.len);
+                    o.put("qty", b.qty);
+                    bars.put(o);
+                }
+                JSONObject t = new JSONObject();
+                t.put("type", e.getKey());
+                t.put("bars", bars);
+                arr.put(t);
+            }
+            return arr.toString();
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
+    private void loadStockBars(String json) {
+        stockBars.clear();
+        if (json == null || json.isEmpty()) return;
+        try {
+            JSONArray arr = new JSONArray(json);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject t = arr.getJSONObject(i);
+                String type = t.optString("type", "");
+                if (type.isEmpty()) continue;
+                JSONArray bars = t.optJSONArray("bars");
+                if (bars == null) continue;
+                List<Engine.StockBar> l = new ArrayList<>();
+                for (int j = 0; j < bars.length(); j++) {
+                    JSONObject o = bars.getJSONObject(j);
+                    l.add(new Engine.StockBar(o.optDouble("len", 0), o.optInt("qty", -1)));
+                }
+                if (!l.isEmpty()) stockBars.put(type, l);
+            }
+        } catch (Exception ignored) {
+            stockBars.clear();
+        }
+    }
 
     /* per-system getters */
     public double dw(int sys) { return sys == WindowItem.DOMAL ? d_dw : z_dw; }
@@ -77,6 +202,7 @@ public class Settings {
          .putString("bizName", bizName)
          .putString("bizAddress", bizAddress)
          .putString("bizMobile", bizMobile)
+         .putString(K_BARS, stockBarsJson())
          .apply();
     }
 
@@ -108,6 +234,7 @@ public class Settings {
         s.bizName = p.getString("bizName", "");
         s.bizAddress = p.getString("bizAddress", "");
         s.bizMobile = p.getString("bizMobile", "");
+        s.loadStockBars(p.getString(K_BARS, ""));
         return s;
     }
 

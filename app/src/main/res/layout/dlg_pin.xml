@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI PIN prompt -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="vertical" android:padding="24dp" android:gravity="center">
+    android:orientation="vertical"
+    android:background="@color/card"
+    android:paddingStart="24dp" android:paddingEnd="24dp"
+    android:paddingTop="26dp" android:paddingBottom="26dp"
+    android:gravity="center">
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Enter PIN to edit prices" android:textSize="13sp"
-        android:textColor="@color/mut" android:layout_marginBottom="14dp"/>
+    <ImageView android:layout_width="52dp" android:layout_height="52dp"
+        android:src="@drawable/ic_v2_lock" android:padding="12dp"
+        android:background="@drawable/bg_icon_tile"
+        android:contentDescription="PIN"
+        app:tint="@color/accText"/>
+
+    <TextView android:id="@+id/tvPinPrompt"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Enter PIN to edit prices" android:textSize="14.5sp"
+        android:labelFor="@+id/etPin"
+        android:textColor="@color/mut" android:layout_marginTop="14dp"
+        android:layout_marginBottom="16dp"/>
 
     <EditText android:id="@+id/etPin"
-        android:layout_width="180dp" android:layout_height="54dp"
+        android:layout_width="200dp" android:layout_height="56dp"
         android:background="@drawable/bg_input"
         android:gravity="center" android:inputType="numberPassword"
         android:maxLength="8" android:textSize="24sp" android:textStyle="bold"
-        android:letterSpacing="0.4" android:textColor="@color/acc"/>
+        android:letterSpacing="0.4" android:textColor="@color/accText"/>
 </LinearLayout>

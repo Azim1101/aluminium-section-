@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One UI bottom sheet: 26dp top corners -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/card"/>
+    <corners android:topLeftRadius="@dimen/ou_sheet_radius"
+        android:topRightRadius="@dimen/ou_sheet_radius"/>
+</shape>

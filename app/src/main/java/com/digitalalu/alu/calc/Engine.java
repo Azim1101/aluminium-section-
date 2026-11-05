@@ -37,22 +37,27 @@ public class Engine {
         return list;
     }
 
+    /**
+     * One UI / Galaxy Violet data-viz palette (v3.0.0).
+     * Ye colours chips, pipe bars aur share kiye jaane wale cutting-plan images
+     * me use hote hain — isliye light aur dark dono background par readable hain.
+     */
     public static int colorOf(String type) {
         if (type.startsWith("Z_")) {
-            if (type.endsWith("FRAME")) return 0xFF3B82F6;
-            if (type.endsWith("SUTTER")) return 0xFF22C55E;
-            if (type.endsWith("MULIYA")) return 0xFF8B5CF6;
-            if (type.endsWith("RP")) return 0xFFEC4899;
+            if (type.endsWith("FRAME")) return 0xFF6C4CF1;    // Galaxy Violet
+            if (type.endsWith("SUTTER")) return 0xFF12A150;   // One UI green
+            if (type.endsWith("MULIYA")) return 0xFFE08600;   // One UI amber
+            if (type.endsWith("RP")) return 0xFFE0447C;       // One UI pink
         } else if (type.startsWith("D_")) {
-            if (type.endsWith("FRAME")) return 0xFF0EA5E9;
-            if (type.endsWith("SUTTER")) return 0xFF14B8A6;
-            if (type.endsWith("RT")) return 0xFFF59E0B;
-            if (type.endsWith("RP")) return 0xFFF43F5E;
+            if (type.endsWith("FRAME")) return 0xFF0E8FA8;    // One UI teal
+            if (type.endsWith("SUTTER")) return 0xFF17A673;
+            if (type.endsWith("RT")) return 0xFFF0A02E;
+            if (type.endsWith("RP")) return 0xFFE0557C;
         } else {
             int hash = type.hashCode();
             return 0xFF000000 | (hash & 0x00FFFFFF);
         }
-        return 0xFF64748B;
+        return 0xFF6E7078;                                    // One UI slate
     }
 
     public static String nameOf(String type) {
@@ -325,7 +330,26 @@ public class Engine {
         public List<Piece> items = new ArrayList<>();
         public double used = 0;
         public boolean over = false;
-        public double free(double stock) { return stock - used; }
+        /** Stock length this bin was cut from (0 = unknown, caller supplies it). */
+        public double stockLen = 0;
+        public double free(double stock) { return (stockLen > 0 ? stockLen : stock) - used; }
+        public double free() { return stockLen - used; }
+        public double length(double fallback) { return stockLen > 0 ? stockLen : fallback; }
+    }
+
+    /**
+     * One size of stock pipe available for a section (FRAME / SUTTER / ...).
+     * qty &lt; 0 means unlimited (you can always buy more of the standard length);
+     * a positive qty is a leftover piece lying in the workshop.
+     */
+    public static class StockBar {
+        public double len;
+        public int qty = -1;
+
+        public StockBar(double l) { len = l; }
+        public StockBar(double l, int q) { len = l; qty = q; }
+        public boolean unlimited() { return qty < 0; }
+        public StockBar copy() { return new StockBar(len, qty); }
     }
 
     /**
@@ -334,7 +358,27 @@ public class Engine {
      * the LEAST remaining space that can still fit the piece.
      * This minimizes waste per bin.
      */
+    /**
+     * Classic single-stock Best Fit Decreasing. Kept so existing behaviour
+     * (and its tests) stay byte-for-byte identical.
+     */
     public static List<Bin> pack(List<Part> parts, double stock, double kerf) {
+        List<StockBar> one = new ArrayList<>();
+        one.add(new StockBar(stock, -1));
+        return packMulti(parts, one, kerf);
+    }
+
+    /**
+     * Best Fit Decreasing over <em>several</em> stock lengths.
+     *
+     * <p>Every section can have its own stock length (frame 192", sutter 180")
+     * plus leftover pieces (96" x 2). For each cut we pick whatever bar leaves
+     * the least remainder — so leftovers get consumed first instead of opening
+     * a fresh full-length pipe.
+     *
+     * <p>With a single unlimited length this reduces exactly to {@link #pack}.
+     */
+    public static List<Bin> packMulti(List<Part> parts, List<StockBar> avail, double kerf) {
         List<Piece> list = new ArrayList<>();
         for (Part p : parts)
             for (int i = 0; i < p.pcs; i++)
@@ -343,37 +387,71 @@ public class Engine {
         // Sort: longest first
         Collections.sort(list, (a, b) -> Double.compare(b.len, a.len));
 
+        // Working copy — opening a leftover bar spends one from its qty.
+        List<StockBar> pool = new ArrayList<>();
+        if (avail != null)
+            for (StockBar sb : avail)
+                if (sb != null && sb.len > 0) pool.add(sb.copy());
+
         List<Bin> bins = new ArrayList<>();
         for (Piece pc : list) {
-            // Oversized piece
-            if (pc.len > stock) {
-                Bin b = new Bin(); b.items.add(pc); b.used = pc.len; b.over = true;
-                bins.add(b);
-                continue;
-            }
-
-            // Best Fit: find bin with minimum remaining space after adding this piece
-            Bin bestFit = null;
-            double bestRemaining = Double.MAX_VALUE;
-
+            // 1) Best already-open bin
+            Bin bestBin = null;
+            double bestBinRem = Double.MAX_VALUE;
             for (Bin b : bins) {
                 if (b.over) continue;
                 double addLen = pc.len + (b.items.isEmpty() ? 0 : kerf);
-                double remaining = stock - b.used - addLen;
-                if (remaining >= -1e-9 && remaining < bestRemaining) {
-                    bestRemaining = remaining;
-                    bestFit = b;
+                double remaining = b.stockLen - b.used - addLen;
+                if (remaining >= -1e-9 && remaining < bestBinRem) {
+                    bestBinRem = remaining;
+                    bestBin = b;
                 }
             }
 
-            if (bestFit == null) {
-                bestFit = new Bin();
-                bins.add(bestFit);
+            // 2) Best brand-new bar we are allowed to open
+            StockBar bestBar = null;
+            double bestBarRem = Double.MAX_VALUE;
+            for (StockBar sb : pool) {
+                if (sb.qty == 0) continue;
+                if (pc.len > sb.len + 1e-9) continue;
+                double remaining = sb.len - pc.len;
+                if (remaining < bestBarRem - 1e-9) {
+                    bestBarRem = remaining;
+                    bestBar = sb;
+                } else if (bestBar != null && Math.abs(remaining - bestBarRem) <= 1e-9) {
+                    // tie -> spend a leftover before fresh stock, then shorter bar
+                    boolean leftA = !sb.unlimited(), leftB = !bestBar.unlimited();
+                    if (leftA && !leftB) { bestBar = sb; bestBarRem = remaining; }
+                    else if (leftA == leftB && sb.len < bestBar.len) { bestBar = sb; bestBarRem = remaining; }
+                }
             }
 
-            double addLen = pc.len + (bestFit.items.isEmpty() ? 0 : kerf);
-            bestFit.used += addLen;
-            bestFit.items.add(pc);
+            // Open bins always beat a fresh bar when they tie, so single-stock
+            // behaviour is unchanged.
+            if (bestBin != null && (bestBar == null || bestBinRem <= bestBarRem + 1e-9)) {
+                double addLen = pc.len + (bestBin.items.isEmpty() ? 0 : kerf);
+                bestBin.used += addLen;
+                bestBin.items.add(pc);
+                continue;
+            }
+
+            if (bestBar != null) {
+                Bin b = new Bin();
+                b.stockLen = bestBar.len;
+                b.used = pc.len;
+                b.items.add(pc);
+                bins.add(b);
+                if (!bestBar.unlimited()) bestBar.qty--;
+                continue;
+            }
+
+            // Oversized — no available pipe is long enough
+            Bin b = new Bin();
+            b.items.add(pc);
+            b.used = pc.len;
+            b.stockLen = pc.len;
+            b.over = true;
+            bins.add(b);
         }
         return bins;
     }
@@ -384,8 +462,22 @@ public class Engine {
         public int pcs;
         public double totalLen;
         public List<Bin> bins;
+        /** Bar lengths actually consumed — varies once leftovers are mixed in. */
+        public List<StockBar> bars = new ArrayList<>();
+
         public int stockNeeded() { return bins == null ? 0 : bins.size(); }
-        public double capacity(double stock) { return stockNeeded() * stock; }
+        public double capacity() {
+            double c = 0;
+            if (bins != null) for (Bin b : bins) c += b.stockLen;
+            return c;
+        }
+        /** @deprecated kept for callers that only know the global stock length. */
+        @Deprecated
+        public double capacity(double stock) {
+            double c = capacity();
+            return c > 0 ? c : stockNeeded() * stock;
+        }
+        public double waste() { return capacity() - totalLen; }
         public double waste(double stock) { return capacity(stock) - totalLen; }
     }
 
@@ -405,7 +497,13 @@ public class Engine {
             TypeSummary ts = new TypeSummary();
             ts.type = t;
             for (Part p : l) { ts.pcs += p.pcs; ts.totalLen += p.len * p.pcs; }
-            ts.bins = s.stock > 0 ? pack(l, s.stock, s.kerf) : new ArrayList<>();
+
+            // Each section may have its own stock length + leftover pieces.
+            List<StockBar> bars = s.barsFor(t);
+            ts.bars = bars;
+            boolean usable = false;
+            for (StockBar sb : bars) if (sb.len > 0) usable = true;
+            ts.bins = usable ? packMulti(l, bars, s.kerf) : new ArrayList<>();
             out.put(t, ts);
         }
         return out;
@@ -444,10 +542,10 @@ public class Engine {
             g.pcs += ts.pcs;
             g.totalLen += ts.totalLen;
             g.stockPipes += ts.stockNeeded();
+            g.capacity += ts.capacity();
             if (isDomal(e.getKey())) g.domalPipes += ts.stockNeeded();
             else g.zedPipes += ts.stockNeeded();
         }
-        g.capacity = g.stockPipes * s.stock;
         g.waste = g.capacity - g.totalLen;
         return g;
     }

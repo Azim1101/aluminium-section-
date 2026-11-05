@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI sheet menu row -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/SheetRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView android:id="@+id/rowIcon" style="@style/SheetRowIcon"
+        android:background="@drawable/bg_icon_tile"/>
+    <LinearLayout style="@style/SheetRowTextBox">
+        <TextView android:id="@+id/rowTitle" style="@style/SheetRowTitle"/>
+        <TextView android:id="@+id/rowSub" style="@style/SheetRowSub"/>
+    </LinearLayout>
+</LinearLayout>

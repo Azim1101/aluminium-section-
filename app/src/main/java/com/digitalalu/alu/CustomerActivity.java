@@ -44,11 +44,11 @@ public class CustomerActivity extends AppCompatActivity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xFFF4F6FB);
+        root.setBackgroundColor(com.digitalalu.alu.ui.V2.col(CustomerActivity.this, com.digitalalu.alu.R.color.bg));
 
         LinearLayout top = new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setBackgroundColor(0xFF2563EB);
+        top.setBackgroundColor(com.digitalalu.alu.ui.V2.col(CustomerActivity.this, com.digitalalu.alu.R.color.acc));
         top.setPadding(dp(16), dp(12), dp(16), dp(12));
         top.setGravity(Gravity.CENTER_VERTICAL);
         TextView t = new TextView(this);
@@ -60,7 +60,7 @@ public class CustomerActivity extends AppCompatActivity {
         top.addView(t);
         TextView cnt = new TextView(this);
         cnt.setText(list.size() + " saved");
-        cnt.setTextColor(0xFFCFE0FF);
+        cnt.setTextColor(com.digitalalu.alu.ui.V2.col(CustomerActivity.this, com.digitalalu.alu.R.color.mut));
         cnt.setTextSize(12);
         top.addView(cnt);
         root.addView(top);
@@ -81,8 +81,11 @@ public class CustomerActivity extends AppCompatActivity {
     private void askPin() {
         View v = getLayoutInflater().inflate(R.layout.dlg_pin, null);
         EditText et = v.findViewById(R.id.etPin);
-        ((TextView) ((LinearLayout) v).getChildAt(0))
-                .setText("Enter PIN to open saved estimates");
+        // v3.0.0 One UI: pehle ye child-index (0) par depend karta tha, jo naye
+        // PIN layout me lock icon aa jaane se ClassCastException deta tha.
+        // Ab proper ID se — koi positional assumption nahi.
+        TextView pinPrompt = v.findViewById(R.id.tvPinPrompt);
+        if (pinPrompt != null) pinPrompt.setText("Enter PIN to open saved estimates");
 
         AlertDialog d = new AlertDialog.Builder(this)
                 .setTitle("Customer records")
@@ -113,7 +116,7 @@ public class CustomerActivity extends AppCompatActivity {
             TextView t = new TextView(this);
             t.setText("No saved estimates yet.\n\nGo back, add windows, then use\nMenu \u2192 Save to customer");
             t.setTextSize(13);
-            t.setTextColor(0xFF94A3B8);
+            t.setTextColor(com.digitalalu.alu.ui.V2.col(CustomerActivity.this, com.digitalalu.alu.R.color.mut));
             t.setGravity(Gravity.CENTER);
             t.setPadding(dp(10), dp(40), dp(10), dp(40));
             box.addView(t);
@@ -132,7 +135,7 @@ public class CustomerActivity extends AppCompatActivity {
                     .setText(c.windows.size() + " windows   \u00b7   " + c.dateStr());
 
             TextView load = v.findViewById(R.id.cuLoad);
-            load.getBackground().setTint(0xFF2563EB);
+            load.getBackground().setTint(com.digitalalu.alu.ui.V2.col(CustomerActivity.this, com.digitalalu.alu.R.color.acc));
             load.setOnClickListener(x -> {
                 Intent r = new Intent();
                 r.putExtra(EXTRA_LOAD_ID, c.id);
@@ -210,7 +213,7 @@ public class CustomerActivity extends AppCompatActivity {
                         if (pc.cutLabel != null) b.append(pc.cutLabel).append(":");
                         b.append(st.fmt(pc.len));
                     }
-                    double left = Math.max(0, bin.free(st.stock));
+                    double left = Math.max(0, bin.length(st.stock) - bin.used);
                     b.append("  [left ").append(st.fmt(left)).append("]\n");
                 }
             }

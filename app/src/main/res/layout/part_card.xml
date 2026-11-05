@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI card: 26dp radius, 18dp padding -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_card"
-    android:padding="14dp"
-    android:layout_marginBottom="10dp">
+    android:padding="@dimen/ou_card_pad"
+    android:layout_marginBottom="12dp">
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/acc"
-        android:textSize="12sp"
+        android:textColor="@color/txt"
+        android:textSize="15sp"
         android:textStyle="bold"
-        android:letterSpacing="0.08"
-        android:layout_marginBottom="10dp"/>
+        android:letterSpacing="-0.01"
+        android:layout_marginBottom="12dp"/>
 
     <LinearLayout
         android:id="@+id/body"

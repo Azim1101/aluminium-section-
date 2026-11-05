@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ALU Window v3.0.0 — One UI dark theme, API 23+.
+  White status-bar icons on the true-black One UI background.
+-->
+<resources>
+    <bool name="ou_light_status">false</bool>
+</resources>

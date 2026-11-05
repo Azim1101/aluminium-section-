@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#FFFFFF" />
-    <corners android:radius="24dp" />
-    <stroke
-        android:width="0.5dp"
-        android:color="#DADCE0" />
+<!-- One UI composer: pill field -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/card2"/>
+    <corners android:radius="@dimen/ou_radius_pill"/>
 </shape>

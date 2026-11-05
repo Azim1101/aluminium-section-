@@ -94,8 +94,8 @@ public class Exporter {
          .append("  (ZED ").append(g.zedWindows).append(" | DOMAL ").append(g.domalWindows).append(")\n");
         b.append("Total pieces : ").append(g.pcs).append("\n");
         b.append("Total length : ").append(s.fmt(g.totalLen)).append(s.unit()).append("\n");
-        b.append("*Stock pipe  : ").append(g.stockPipes).append(" pcs*  (")
-         .append(s.fmt(s.stock)).append(s.unit()).append(" each)\n");
+        b.append("*Stock pipe  : ").append(g.stockPipes).append(" pcs*\n");
+        b.append(stockPipeLines(sum, s));
         b.append("Waste        : ").append(s.fmt(g.waste)).append(s.unit())
          .append(" (").append(String.format(Locale.US, "%.1f", g.wastePct())).append("%)\n");
         if (g.glassSqft > 0)
@@ -103,6 +103,28 @@ public class Exporter {
 
         String footer = s.bizFooter();
         if (!footer.isEmpty()) b.append("\n_").append(footer).append("_");
+        return b.toString();
+    }
+
+    /** "  ZED FRAME : 192\" x 3   (+96\" x2 leftover)" — only when customised. */
+    private static String stockPipeLines(Map<String, Engine.TypeSummary> sum, Settings s) {
+        StringBuilder b = new StringBuilder();
+        for (Engine.TypeSummary ts : sum.values()) {
+            if (ts.bins == null || ts.bins.isEmpty()) continue;
+            double main = s.primaryStockFor(ts.type);
+            b.append("  ").append(Engine.nameOf(ts.type)).append(" : ")
+             .append(s.fmt(main)).append(s.unit());
+            List<Engine.StockBar> extras = s.extrasFor(ts.type);
+            if (!extras.isEmpty()) {
+                b.append("   (+");
+                for (int i = 0; i < extras.size(); i++) {
+                    if (i > 0) b.append(", ");
+                    b.append(s.fmt(extras.get(i).len)).append(" x").append(extras.get(i).qty);
+                }
+                b.append(")");
+            }
+            b.append("\n");
+        }
         return b.toString();
     }
 
@@ -190,7 +212,8 @@ public class Exporter {
             String title = Engine.nameOf(pipeType) + "  \u2014  " + pipeCount + " pipes";
             c.drawText(title, pad, pad + 50, pTitle);
             String sub = ts.pcs + " pcs  \u2022  " + s.fmtU(ts.totalLen)
-                    + "  \u2022  stock " + s.fmtU(s.stock) + "  \u2022  waste " + s.fmtU(ts.waste(s.stock));
+                    + "  \u2022  stock " + s.fmtU(s.primaryStockFor(pipeType))
+                    + "  \u2022  waste " + s.fmtU(ts.waste());
             c.drawText(sub, pad, pad + 90, pSub);
 
             float barLeft = pad;
@@ -203,9 +226,10 @@ public class Exporter {
                 Engine.Bin bin = ts.bins.get(i);
 
                 // Label
-                double wasteVal = Math.max(0, bin.free(s.stock));
-                String lab = "Pipe #" + (i + 1) + "   used " + s.fmt(bin.used) + " / " + s.fmt(s.stock)
-                        + "   left " + s.fmt(wasteVal);
+                double barLen = bin.length(s.stock);
+                double wasteVal = Math.max(0, barLen - bin.used);
+                String lab = "Pipe #" + (i + 1) + "   " + s.fmt(barLen) + s.unit()
+                        + "   used " + s.fmt(bin.used) + "   left " + s.fmt(wasteVal);
                 c.drawText(lab, pad, y + labelH - 4, pLabel);
                 y += labelH;
 
@@ -217,7 +241,7 @@ public class Exporter {
                 float x = barLeft;
                 for (int j = 0; j < bin.items.size(); j++) {
                     Engine.Piece pc = bin.items.get(j);
-                    float pw = (float) (pc.len / s.stock) * barW;
+                    float pw = (float) (pc.len / barLen) * barW;
                     pw = Math.max(pw, 8);
 
                     r.set(x, y, x + pw, y + barH);
@@ -324,7 +348,7 @@ public class Exporter {
             for (Engine.TypeSummary ts : zedS.values())
                 x.row().text("   " + Engine.shortName(ts.type)).intg(ts.pcs)
                        .num(s.out(ts.totalLen)).intg(ts.stockNeeded())
-                       .num(s.out(ts.waste(s.stock)));
+                       .num(s.out(ts.waste()));
             x.row().text("   ZED TOTAL", XlsxWriter.S_BOLD).blank().blank()
                    .intg(g.zedPipes).blank();
         }
@@ -333,7 +357,7 @@ public class Exporter {
             for (Engine.TypeSummary ts : domS.values())
                 x.row().text("   " + Engine.shortName(ts.type)).intg(ts.pcs)
                        .num(s.out(ts.totalLen)).intg(ts.stockNeeded())
-                       .num(s.out(ts.waste(s.stock)));
+                       .num(s.out(ts.waste()));
             x.row().text("   DOMAL TOTAL", XlsxWriter.S_BOLD).blank().blank()
                    .intg(g.domalPipes).blank();
         }
@@ -401,7 +425,7 @@ public class Exporter {
                 }
                 x.row().text(Engine.nameOf(ts.type)).intg(i + 1)
                        .text(cuts.toString())
-                       .num(s.out(bin.used)).num(s.out(Math.max(0, bin.free(s.stock))));
+                       .num(s.out(bin.used)).num(s.out(Math.max(0, bin.length(s.stock) - bin.used)));
             }
         }
 

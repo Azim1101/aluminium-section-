@@ -1,29 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ALU Window v3.0.0 — One UI customer form -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:background="@color/card">
 <LinearLayout
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="vertical" android:padding="20dp">
+    android:orientation="vertical"
+    android:paddingStart="22dp" android:paddingEnd="22dp"
+    android:paddingTop="18dp" android:paddingBottom="24dp">
 
-    <TextView style="@style/FieldLabel" android:text="CUSTOMER NAME"/>
+    <TextView style="@style/FieldLabel" android:text="CUSTOMER NAME" android:labelFor="@+id/cName"/>
     <EditText android:id="@+id/cName" android:layout_width="match_parent"
-        android:layout_height="44dp" android:background="@drawable/bg_input"
-        android:inputType="textPersonName" android:textSize="14sp" android:padding="8dp"/>
+        android:layout_height="@dimen/ou_field_h" android:background="@drawable/bg_input"
+        android:inputType="textPersonName" android:textColor="@color/txt"
+        android:textColorHint="@color/hint"
+        android:textSize="15sp" android:gravity="center_vertical"
+        android:paddingStart="14dp" android:paddingEnd="14dp"/>
 
-    <TextView style="@style/FieldLabel" android:text="MOBILE NO" android:layout_marginTop="10dp"/>
+    <TextView style="@style/FieldLabel" android:text="MOBILE NO" android:layout_marginTop="14dp" android:labelFor="@+id/cMobile"/>
     <EditText android:id="@+id/cMobile" android:layout_width="match_parent"
-        android:layout_height="44dp" android:background="@drawable/bg_input"
-        android:inputType="phone" android:textSize="14sp" android:padding="8dp"/>
+        android:layout_height="@dimen/ou_field_h" android:background="@drawable/bg_input"
+        android:inputType="phone" android:textColor="@color/txt"
+        android:textColorHint="@color/hint"
+        android:textSize="15sp" android:gravity="center_vertical"
+        android:paddingStart="14dp" android:paddingEnd="14dp"/>
 
-    <TextView style="@style/FieldLabel" android:text="VILLAGE / AREA" android:layout_marginTop="10dp"/>
+    <TextView style="@style/FieldLabel" android:text="VILLAGE / AREA" android:layout_marginTop="14dp" android:labelFor="@+id/cVillage"/>
     <EditText android:id="@+id/cVillage" android:layout_width="match_parent"
-        android:layout_height="44dp" android:background="@drawable/bg_input"
-        android:inputType="text" android:textSize="14sp" android:padding="8dp"/>
+        android:layout_height="@dimen/ou_field_h" android:background="@drawable/bg_input"
+        android:inputType="text" android:textColor="@color/txt"
+        android:textColorHint="@color/hint"
+        android:textSize="15sp" android:gravity="center_vertical"
+        android:paddingStart="14dp" android:paddingEnd="14dp"/>
 
-    <TextView style="@style/FieldLabel" android:text="NOTE" android:layout_marginTop="10dp"/>
+    <TextView style="@style/FieldLabel" android:text="NOTE" android:layout_marginTop="14dp" android:labelFor="@+id/cNote"/>
     <EditText android:id="@+id/cNote" android:layout_width="match_parent"
-        android:layout_height="70dp" android:background="@drawable/bg_input"
+        android:layout_height="88dp" android:background="@drawable/bg_input"
         android:inputType="textMultiLine" android:gravity="top"
-        android:textSize="13sp" android:padding="8dp"/>
+        android:textColor="@color/txt" android:textColorHint="@color/hint"
+        android:textSize="14sp" android:padding="14dp"/>
 </LinearLayout>
 </ScrollView>

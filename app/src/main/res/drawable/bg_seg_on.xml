@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One UI segmented selection: violet pill -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/acc"/>
+    <corners android:radius="@dimen/ou_radius_pill"/>
+</shape>

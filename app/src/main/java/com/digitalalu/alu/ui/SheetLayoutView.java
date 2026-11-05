@@ -14,9 +14,10 @@ import com.digitalalu.alu.calc.Settings;
 /** Visual layout preview for one manually optimized stock sheet. */
 public class SheetLayoutView extends View {
 
+    /** One UI / Galaxy Violet series palette (v3.0.0). */
     private static final int[] COLORS = {
-            0xFF2563EB, 0xFF16A34A, 0xFFF59E0B, 0xFF8B5CF6,
-            0xFFEC4899, 0xFF0EA5E9, 0xFFEA580C, 0xFF64748B
+            0xFF6C4CF1, 0xFF12A150, 0xFFE08600, 0xFF8B5CF6,
+            0xFFE0447C, 0xFF0E8FA8, 0xFFEA6A2E, 0xFF6E7078
     };
 
     private ManualCuttingEngine.SheetBin bin;
@@ -38,11 +39,11 @@ public class SheetLayoutView extends View {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         stroke.setStyle(Paint.Style.STROKE);
         stroke.setStrokeWidth(dp(1));
-        stroke.setColor(0xFF334155);
+        stroke.setColor(0xFF4A4C54);
         text.setTextAlign(Paint.Align.CENTER);
         text.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT,
                 android.graphics.Typeface.BOLD));
-        facePaint.setColor(0xFF2563EB);
+        facePaint.setColor(0xFF6C4CF1);
         facePaint.setStrokeWidth(dp(1.5f));
         facePaint.setTextSize(dp(9));
         facePaint.setTypeface(android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT,
@@ -115,7 +116,7 @@ public class SheetLayoutView extends View {
             canvas.drawRoundRect(rect, dp(2), dp(2), fill);
             stroke.setColor(0x99FFFFFF);
             canvas.drawRoundRect(rect, dp(2), dp(2), stroke);
-            stroke.setColor(0xFF334155);
+            stroke.setColor(0xFF4A4C54);
 
             if (w >= dp(34) && h >= dp(22)) {
                 text.setColor(Color.WHITE);
@@ -135,7 +136,7 @@ public class SheetLayoutView extends View {
         }
 
         text.setTextSize(dp(9));
-        text.setColor(0xFF475569);
+        text.setColor(0xFF6E7078);
         text.setTextAlign(Paint.Align.LEFT);
         String title = "Sheet #" + sheetNo;
         canvas.drawText(title, sx + dp(4), sy + dp(12), text);
