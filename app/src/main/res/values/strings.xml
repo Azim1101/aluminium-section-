@@ -3,4 +3,6 @@
     <string name="app_name">ALU Window</string>
     <string name="ou_app_kicker">ALU WINDOW</string>
     <string name="ou_add_row">+  Add row</string>
+    <string name="designer_title">Window &amp; Door Designer</string>
+    <string name="designer_notice">Offline rectangular elevation. Equal fixed bays; door mode labels a door elevation only. No hinges, sliding tracks, fabrication deductions or glass clearances are calculated. Save JSON to keep your design.</string>
 </resources>

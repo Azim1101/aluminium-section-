@@ -1211,6 +1211,7 @@ public class MainActivity extends AppCompatActivity {
         box.addView(title);
 
         String[][] rows = {
+                {"\u25A6", "Window & Door Designer", "Native elevation drawing, JSON, PDF and DXF"},
                 {"\uD83E\uDD16", "AI Agent (Chat)", "Hinglish me baat karke window add karein"},
                 {"\uD83D\uDC64", "My Profile", "Business name, address, mobile"},
                 {"\uD83D\uDCBE", "Save to customer", "Current estimate ko customer me save karein"},
@@ -1237,7 +1238,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onMenuAction(String t) {
-        if (t.contains("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
+        if (t.startsWith("Window & Door Designer")) startActivity(new Intent(this, DesignerActivity.class));
+        else if (t.contains("AI Agent")) startActivity(new Intent(this, AgentActivity.class));
         else if (t.contains("My Profile")) startActivity(new Intent(this, UserProfileActivity.class));
         else if (t.startsWith("Save to")) saveToCustomer();
         else if (t.startsWith("Customer")) startActivityForResult(

@@ -39,6 +39,9 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".DesignerActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
+
         <activity android:name=".PriceActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".CustomerActivity" android:exported="false"/>

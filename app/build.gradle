@@ -49,8 +49,8 @@ android {
         // 1.0.1 — mobile-app-ux-auditor skill ke fixes (accessibility labels)
         // 1.1.0 — FunctionGemma 270M on-device tool-calling tier (REAL runtime,
         //         LiteRT-LM bundled; minSdk 24)
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 20
+        versionName "1.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Real devices only: arm64 (MNN + LiteRT-LM) and armv7 (MNN-only fallback).
         // LiteRT-LM ka x86_64 lib (26 MB, sirf emulator ke liye) APK se hata deta hai.
